@@ -1,0 +1,25 @@
+{
+  "name": "jq-phototagging",
+  "version": "0.1.0",
+  "authors": [
+    "Mickael Jeanroy <mickael.jeanroy@gmail.com>"
+  ],
+  "description": "Simple jQuery Photo Tagging",
+  "main": "src/jq-phototagging.js",
+  "keywords": [
+    "jQuery",
+    "tag"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "1.8.x"
+  }
+}
