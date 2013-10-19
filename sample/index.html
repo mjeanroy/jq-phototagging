@@ -1,10 +1,71 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Sample jq-AutoComplete</title>
-	<script type="text/javascript" src="jquery/jquery.js"></script>
-	<script type="text/javascript" src="jq-phototagging.js"></script>
+  <title>Sample jq-AutoComplete</title>
+  <script type="text/javascript" src="jquery/jquery.js"></script>
+  <script type="text/javascript" src="jq-phototagging.js"></script>
+
+  <link rel="stylesheet" href="bootstrap.css/css/bootstrap.css"/>
+  <link rel="stylesheet" href="jq-phototagging.css"/>
+
+  <style>
+    .pic-tags {
+      overflow: hidden;
+    }
+
+    .pic {
+      float: left;
+    }
+
+    .tags {
+      float: left;
+    }
+  </style>
 </head>
 <body>
+
+<div class="pic-tags">
+  <div class="pic">
+    <img src="sample.jpg"/>
+  </div>
+  <ul class="tags"></ul>
+</div>
+
+<div class="license">
+  <p>Image from Arno Meintjes.</p>
+
+  <p>License: Creative Commons</p>
+
+  <p>Original: http://www.flickr.com/photos/arnolouise/8330315868/sizes/c/in/pool-809956@N25/</p>
+</div>
+
+<script type="text/javascript">
+  var tag1 = {
+    id: 1,
+    name: 'First Tag',
+    imgWidth: 800,
+    imgHeight: 534,
+    x: 500,
+    y: 200,
+    width: 250,
+    height: 300
+  };
+
+  var tag2 = {
+    id: 2,
+    name: 'Second Tag',
+    imgWidth: 800,
+    imgHeight: 534,
+    x: 150,
+    y: 150,
+    width: 250,
+    height: 215
+  };
+
+  $('img').jqPhotoTagging({
+    $tags: '.tags',
+    tags: [tag1, tag2]
+  });
+</script>
 </body>
 </html>
