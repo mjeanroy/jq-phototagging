@@ -27,6 +27,10 @@ describe("jQuery PhotoTagging Test Suite", function() {
     spyOn($.fn, 'html').andCallThrough();
     spyOn($.fn, 'on').andCallThrough();
     spyOn($.fn, 'off').andCallThrough();
+    spyOn($.fn, 'focus').andCallThrough();
+    spyOn($.fn, 'show').andCallThrough();
+    spyOn($.fn, 'hide').andCallThrough();
+    spyOn($.fn, 'val').andCallThrough();
   });
 
   describe("jQuery Phototagging: initialization", function() {
@@ -36,14 +40,22 @@ describe("jQuery PhotoTagging Test Suite", function() {
       expect(defaults).toEqual({
         width: 100,
         height: 100,
+        readOnly: false,
+        url: '',
+        method: 'POST',
+        dataType: 'json',
         tags: [],
         $tags: null,
         label: jasmine.any(Function),
         tagSize: jasmine.any(Function),
         imgSize: jasmine.any(Function),
         ratio: jasmine.any(Function),
+        resultFn: jasmine.any(Function),
+        paramsFn: jasmine.any(Function),
         onLoaded: jasmine.any(Function),
-        onInitialized: jasmine.any(Function)
+        onInitialized: jasmine.any(Function),
+        onSavedSuccess: jasmine.any(Function),
+        onSavedFailed: jasmine.any(Function)
       });
     });
 
@@ -65,14 +77,22 @@ describe("jQuery PhotoTagging Test Suite", function() {
       expect($photo.opts).toEqual({
         width: 50,
         height: 50,
+        readOnly: false,
+        url: '',
+        method: 'POST',
+        dataType: 'json',
         tags: [],
         $tags: null,
         label: jasmine.any(Function),
         tagSize: jasmine.any(Function),
         imgSize: jasmine.any(Function),
         ratio: jasmine.any(Function),
+        resultFn: jasmine.any(Function),
+        paramsFn: jasmine.any(Function),
         onLoaded: jasmine.any(Function),
-        onInitialized: jasmine.any(Function)
+        onInitialized: jasmine.any(Function),
+        onSavedSuccess: jasmine.any(Function),
+        onSavedFailed: jasmine.any(Function)
       });
 
       var defaults = jQuery.fn.jqPhotoTagging.options;
@@ -80,14 +100,22 @@ describe("jQuery PhotoTagging Test Suite", function() {
       expect(defaults).toEqual({
         width: 100,
         height: 100,
+        readOnly: false,
+        url: '',
+        method: 'POST',
+        dataType: 'json',
         tags: [],
         $tags: null,
         label: jasmine.any(Function),
         tagSize: jasmine.any(Function),
         imgSize: jasmine.any(Function),
         ratio: jasmine.any(Function),
+        resultFn: jasmine.any(Function),
+        paramsFn: jasmine.any(Function),
         onLoaded: jasmine.any(Function),
-        onInitialized: jasmine.any(Function)
+        onInitialized: jasmine.any(Function),
+        onSavedSuccess: jasmine.any(Function),
+        onSavedFailed: jasmine.any(Function)
       });
     });
 
@@ -113,7 +141,61 @@ describe("jQuery PhotoTagging Test Suite", function() {
       var $wrapper = this.$img.parent();
       expect($wrapper).toBeDefined();
       expect($wrapper.length).toBe(1);
+      expect($wrapper.hasClass('jq-phototagging-readonly')).toBe(false);
+
+      var $tags = this.$img.next();
+      expect($tags).toBeDefined();
+      expect($tags.length).toBe(1);
+
+      var $boxes = $tags.next();
+      expect($boxes).toBeDefined();
+
+      var $form = $boxes.next();
+      expect($form).toBeDefined();
+      expect($form.length).toBe(1);
+      expect($form.hasClass('jq-phototagging-form')).toBe(true);
+      expect($form.get(0)).toEqual(this.$fixtures.find('form').get(0));
+      expect($form.get(0)).toEqual($photo.$form.get(0));
+
+      var $box = $form.find('div');
+      expect($box).toBeDefined();
+      expect($box.length).toBe(1);
+      expect($box.hasClass('jq-phototagging-form-box')).toBe(true);
+
+      var $input = $form.find('input');
+      expect($input).toBeDefined();
+      expect($input.length).toBe(1);
+      expect($input.get(0)).toEqual(this.$fixtures.find('input').get(0));
+
+      expect(onInitialized).toHaveBeenCalledWith($photo.$wrapper, $photo.$form);
+      expect(onLoaded).toHaveBeenCalledWith($photo.tags, $photo.$tags);
+    });
+
+    it("should generate html (readonly)", function() {
+      var onInitialized = jasmine.createSpy('onInitialized');
+      var onLoaded = jasmine.createSpy('onLoaded');
+
+      this.$img.jqPhotoTagging({
+        width: 50,
+        height: 50,
+        readOnly: true,
+        tags: [this.tag],
+        onInitialized: onInitialized,
+        onLoaded: onLoaded
+      });
+
+      // trigger images loaded event
+      this.$img.trigger('load');
+
+      var $photo = this.$img.data('jqPhotoTagging');
+      expect($photo.$img).toBeDefined();
+      expect($photo.$img.get(0)).toEqual(this.$img.get(0));
+
+      var $wrapper = this.$img.parent();
+      expect($wrapper).toBeDefined();
+      expect($wrapper.length).toBe(1);
       expect($wrapper.hasClass('jq-phototagging-wrapper')).toBe(true);
+      expect($wrapper.hasClass('jq-phototagging-readonly')).toBe(true);
       expect($wrapper.get(0)).not.toEqual(this.$fixtures.get(0));
       expect($wrapper.get(0)).toEqual($photo.$wrapper.get(0));
 
@@ -144,7 +226,13 @@ describe("jQuery PhotoTagging Test Suite", function() {
       expect($box1.length).toBe(1);
       expect($box1.hasClass('jq-phototagging-tag-box')).toBe(true);
 
-      expect(onInitialized).toHaveBeenCalledWith($photo.$wrapper);
+      var $form = $wrapper.find('form');
+      expect($form).toBeDefined();
+      expect($form.length).toBe(0);
+      expect($photo.$form).toBeUndefined();
+      expect($photo.$input).toBeUndefined();
+
+      expect(onInitialized).toHaveBeenCalledWith($photo.$wrapper, undefined);
       expect(onLoaded).toHaveBeenCalledWith($photo.tags, $photo.$tags);
     });
   });
@@ -162,6 +250,8 @@ describe("jQuery PhotoTagging Test Suite", function() {
       this.$photo = this.$img.data('jqPhotoTagging');
       this.$boxes = this.$photo.$boxes;
       this.$tags = this.$photo.$tags;
+      this.$form = this.$photo.$form;
+      this.$input = this.$photo.$input;
     });
 
     describe("User Events", function() {
@@ -175,6 +265,9 @@ describe("jQuery PhotoTagging Test Suite", function() {
       it("should bind user events", function() {
         expect(this.$tags.on).toHaveBeenCalledWith('mouseenter.jqphototagging', 'li', jasmine.any(Function));
         expect(this.$tags.on).toHaveBeenCalledWith('mouseleave.jqphototagging', 'li', jasmine.any(Function));
+
+        expect(this.$img.on).toHaveBeenCalledWith('click.jqphototagging', jasmine.any(Function));
+        expect(this.$form.on).toHaveBeenCalledWith('submit.jqphototagging', jasmine.any(Function));
       });
 
       it("should show boxes when user is hover tag name", function() {
@@ -191,6 +284,182 @@ describe("jQuery PhotoTagging Test Suite", function() {
 
         $li.trigger('mouseleave');
         expect($box.hasClass('jq-phototagging-visible')).toBe(false);
+      });
+    });
+
+    describe("Tag Form", function() {
+      beforeEach(function() {
+        this.xhr = jasmine.createSpyObj('xhr', ['done', 'fail', 'always']);
+        spyOn($, 'ajax').andReturn(this.xhr);
+
+        this.$photo.opts.url = '/foo';
+        this.$photo.opts.width = 100;
+        this.$photo.opts.height = 200;
+        this.$photo.x = 10;
+        this.$photo.y = 20;
+        this.$photo.$img.width.andReturn(50);
+        this.$photo.$img.height.andReturn(60);
+
+        spyOn(this.$photo, 'appendTags').andCallThrough();
+        spyOn(this.$photo, 'hideForm').andCallThrough();
+
+        this.tag = {
+          name: 'foobar',
+          x: 10,
+          y: 20,
+          width: 100,
+          height: 200,
+          imgWidth: 50,
+          imgHeight: 60
+        };
+      });
+
+      it("should show form if user click on image", function() {
+        spyOn(this.$photo, 'showForm');
+        var event = jQuery.Event('click');
+        event.pageX = 10;
+        event.pageY = 20;
+        this.$img.trigger(event);
+        expect(this.$photo.showForm).toHaveBeenCalledWith(10, 20);
+      });
+
+      it("should submit form if user submit a value", function() {
+        spyOn(this.$photo, 'submitForm');
+        this.$input.val('foobar');
+        this.$form.trigger('submit');
+        expect(this.$photo.submitForm).toHaveBeenCalledWith('foobar');
+      });
+
+      it("should not submit form if user does not submit a value", function() {
+        spyOn(this.$photo, 'submitForm');
+        this.$input.val('');
+        this.$form.trigger('submit');
+        expect(this.$photo.submitForm).not.toHaveBeenCalled();
+      });
+
+      it("should not submit form if user submit spaces", function() {
+        spyOn(this.$photo, 'submitForm');
+        this.$input.val('  ');
+        this.$form.trigger('submit');
+        expect(this.$photo.submitForm).not.toHaveBeenCalled();
+      });
+
+      it("should show form at given position", function() {
+        this.$photo.showForm(10, 20);
+        expect(this.$photo.x).toBe(10);
+        expect(this.$photo.y).toBe(20);
+        expect(this.$form.css).toHaveBeenCalledWith({
+          top: 20,
+          left: 10
+        });
+        expect(this.$form.show).toHaveBeenCalled();
+        expect(this.$input.focus).toHaveBeenCalled();
+      });
+
+      it("should hide form", function() {
+        this.$photo.hideForm();
+        expect(this.$form.hide).toHaveBeenCalled();
+      });
+
+      it("should not submit if form is submitting", function() {
+        this.$photo.$submitting = true;
+        this.$photo.submitForm('foobar');
+        expect($.ajax).not.toHaveBeenCalled();
+      });
+
+      it("should submit form", function() {
+        this.$photo.submitForm('foobar');
+        expect($.ajax).toHaveBeenCalledWith({
+          url: '/foo',
+          type: 'POST',
+          data: {
+            value: 'foobar',
+            x: 10,
+            y: 20,
+            width: 100,
+            height: 200,
+            imgWidth: 50,
+            imgHeight: 60
+          },
+          dataType: 'json'
+        });
+
+        expect(this.$photo.$submitting).toBe(true);
+
+        expect(this.xhr.done).toHaveBeenCalledWith(jasmine.any(Function));
+        expect(this.xhr.fail).toHaveBeenCalledWith(jasmine.any(Function));
+        expect(this.xhr.always).toHaveBeenCalledWith(jasmine.any(Function));
+
+        this.$photo.opts.onSavedFailed = jasmine.createSpy('onSavedFailed');
+        this.xhr.fail.argsForCall[0][0]();
+        expect(this.$photo.opts.onSavedFailed).toHaveBeenCalled();
+        expect(this.$photo.$submitting).toBe(true);
+
+        this.$photo.opts.onSavedSuccess = jasmine.createSpy('onSavedSuccess');
+        this.xhr.done.argsForCall[0][0](this.tag);
+        expect(this.$photo.opts.onSavedSuccess).toHaveBeenCalledWith(this.tag);
+        expect(this.$photo.appendTags).toHaveBeenCalledWith(this.tag);
+        expect(this.$photo.hideForm).toHaveBeenCalled();
+        expect(this.$input.val).toHaveBeenCalledWith('');
+        expect(this.$photo.$submitting).toBe(true);
+
+        this.xhr.always.argsForCall[0][0]();
+        expect(this.$photo.$submitting).toBe(false);
+      });
+
+      it("should submit form with custom parameters", function() {
+        spyOn(this.$photo.opts, 'paramsFn').andCallFake(function(param) {
+          delete param.value;
+          return {
+            name: 'foo'
+          };
+        });
+
+        this.$photo.$img.height.andReturn(60);
+
+        this.$photo.submitForm('foobar');
+        expect(this.$photo.opts.paramsFn).toHaveBeenCalled();
+        expect($.ajax).toHaveBeenCalledWith({
+          url: '/foo',
+          type: 'POST',
+          data: {
+            x: 10,
+            y: 20,
+            width: 100,
+            height: 200,
+            imgWidth: 50,
+            imgHeight: 60,
+            name: 'foo'
+          },
+          dataType: 'json'
+        });
+      });
+
+      it("should submit form and transform result tag", function() {
+        spyOn(this.$photo.opts, 'resultFn').andCallFake(function(result) {
+          result.x += 10;
+          result.y += 10;
+          return result;
+        });
+
+        this.$photo.submitForm('foobar');
+
+        expect($.ajax).toHaveBeenCalled();
+        expect(this.xhr.done).toHaveBeenCalledWith(jasmine.any(Function));
+        expect(this.xhr.fail).toHaveBeenCalledWith(jasmine.any(Function));
+        expect(this.xhr.always).toHaveBeenCalledWith(jasmine.any(Function));
+
+        this.xhr.done.argsForCall[0][0](this.tag);
+        expect(this.$photo.opts.resultFn).toHaveBeenCalledWith(this.tag);
+        expect(this.$photo.appendTags).toHaveBeenCalledWith({
+          name: 'foobar',
+          x: 20,
+          y: 30,
+          width: 100,
+          height: 200,
+          imgWidth: 50,
+          imgHeight: 60
+        });
       });
     });
 
@@ -301,8 +570,12 @@ describe("jQuery PhotoTagging Test Suite", function() {
     describe('Destroy', function() {
       it("should unbind user events", function() {
         var $tags = this.$photo.$tags;
+        var $form = this.$photo.$form;
+        var $img = this.$photo.$img;
         this.$photo.unbind();
         expect($tags.off).toHaveBeenCalledWith('.jqphototagging');
+        expect($form.off).toHaveBeenCalledWith('.jqphototagging');
+        expect($img.off).toHaveBeenCalledWith('.jqphototagging');
       });
 
       it("should destroy plugin", function() {

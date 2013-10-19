@@ -29,11 +29,32 @@
   position: relative;
 }
 
+.jq-phototagging-img {
+  cursor: crosshair;
+}
+
+.jq-phototagging-readonly > .jq-phototagging-img {
+  cursor: default;
+}
+
 .jq-phototagging-tag-box {
   position: absolute;
   cursor: default;
 }
 
+.jq-phototagging-form {
+  position: absolute;
+
+  display: inline-block;
+  *zoom: 1;
+}
+
+.jq-phototagging-form input {
+  padding: 0;
+  margin: 0;
+}
+
+.jq-phototagging-form-box,
 .jq-phototagging-tag-box:hover,
 .jq-phototagging-visible {
   border: solid 2px #fff;

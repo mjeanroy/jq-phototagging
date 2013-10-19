@@ -47,6 +47,13 @@
   var CSS_PREFIX = 'jq-phototagging-';
 
   /**
+   * Css class added on images.
+   * @type {string}
+   * @const
+   */
+  var CSS_IMG = CSS_PREFIX + 'img';
+
+  /**
    * Css class added on main wrapper.
    * @type {string}
    * @const
@@ -88,8 +95,35 @@
    */
   var CSS_VISIBLE = CSS_PREFIX + 'visible';
 
+  /**
+   * Css class added on form used to type new tag.
+   * @type {string}
+   * @const
+   */
+  var CSS_FORM = CSS_PREFIX + 'form';
+
+  /**
+   * Css class added on box displayed in form used to type new tag.
+   * @type {string}
+   * @const
+   */
+  var CSS_FORM_BOX = CSS_PREFIX + 'form-box';
+
+  /**
+   * Css class added on wrapper when image is read-only (cannot add new tag).
+   * @type {string}
+   * @const
+   */
+  var CSS_RO = CSS_PREFIX + 'readonly';
+
   /** No op function */
-  var noop = function() {};
+  var noop = function() {
+  };
+
+  /** Function that return parameter */
+  var identity = function(obj) {
+    return obj;
+  };
 
   /** Generate a unique id */
   var uniqId = function() {
@@ -164,7 +198,7 @@
     var blank = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
 
     $img
-      .bind('load.imgloaded',function() {
+      .bind('load.imgloaded', function() {
         $img.unbind('load.imgloaded');
         callback.call(context);
       })
@@ -193,13 +227,15 @@
     this.x = 0;
     this.y = 0;
 
-    this.tags = options.tags || [];
+    this.tags = [];
   };
 
   PhotoTagging.prototype = {
     /** Initialize plugin */
     init: function() {
       var $img = this.$img;
+
+      $img.addClass(CSS_IMG);
 
       // Wrap image (to get relative position position)
       var $wrapper = $('<div></div>').addClass(CSS_WRAPPER);
@@ -229,15 +265,45 @@
       this.$tags = $tags;
       this.$boxes = $boxes;
 
+      if (!this.opts.readOnly) {
+        var $form = $('<form></form>')
+          .addClass(CSS_FORM)
+          .appendTo($wrapper);
+
+        $('<div></div>')
+          .addClass(CSS_FORM_BOX)
+          .css({
+            width: this.opts.width,
+            height: this.opts.height
+          })
+          .appendTo($form);
+
+        var $input = $('<input type="text"/>')
+          .css({
+            width: this.opts.width
+          })
+          .appendTo($form);
+
+        this.$form = $form;
+        this.$input = $input;
+      }
+      else {
+        $wrapper.addClass(CSS_RO);
+      }
+
       this.bind();
 
-      this.opts.onInitialized.call(this, this.$wrapper);
+      this.opts.onInitialized.call(this, this.$wrapper, this.$form);
 
-      imageLoaded(this.$img, function() {
-        this.$tags.html('');
-        this.appendTags(this.tags);
-        this.opts.onLoaded.call(this, this.tags, this.$tags);
-      }, this);
+      imageLoaded(
+        this.$img,
+        function() {
+          this.$tags.html('');
+          this.appendTags(this.opts.tags || []);
+          this.opts.onLoaded.call(this, this.tags, this.$tags);
+        },
+        this
+      );
     },
 
     /** Bind user events. */
@@ -253,6 +319,106 @@
       this.$tags.on('mouseleave' + NAMESPACE, 'li', function() {
         that.$boxes.find('div').removeClass(CSS_VISIBLE);
       });
+
+      this.bindForm();
+    },
+
+    /** Bind user events on form */
+    bindForm: function() {
+      if (this.$form) {
+        var that = this;
+
+        this.$img.on('click' + NAMESPACE, function(e) {
+          that.showForm(e.pageX, e.pageY);
+        });
+
+        this.$form.on('submit' + NAMESPACE, function(e) {
+          e.preventDefault();
+          var val = $.trim(that.$input.val());
+          if (val) {
+            that.submitForm(val);
+          }
+        });
+      }
+    },
+
+    /** Display form used to type a new tag. */
+    showForm: function(x, y) {
+      this.x = x;
+      this.y = y;
+
+      this.$form.css({
+        left: x,
+        top: y
+      });
+
+      this.$form.show();
+      this.$input.focus();
+    },
+
+    /** Hide form used to type a new tag. */
+    hideForm: function() {
+      this.$form.hide();
+    },
+
+    /**
+     * Save a new tag.
+     * @param {string} value Value of tag.
+     */
+    submitForm: function(value) {
+      if (!this.$submitting) {
+        this.$submitting = true;
+
+        var params = this.params(value);
+
+        var xhr = $.ajax({
+          url: this.opts.url,
+          type: this.opts.method,
+          data: params,
+          dataType: this.opts.dataType
+        });
+
+        var that = this;
+
+        xhr.done(function(data) {
+          that.opts.onSavedSuccess.apply(that, arguments);
+
+          // Hide form
+          that.$input.val('');
+          that.hideForm();
+
+          // Append tag
+          var tag = that.opts.resultFn.call(that, data);
+          that.appendTags(tag);
+        });
+
+        xhr.fail(function() {
+          that.opts.onSavedFailed.apply(that, arguments);
+        });
+
+        xhr.always(function() {
+          that.$submitting = false;
+        });
+      }
+    },
+
+    /**
+     * Build parameters send to save a new tag.
+     * @param {string} value Name of tag.
+     * @returns {object} Parameter object.
+     */
+    params: function(value) {
+      var defaultParams = {
+        value: value,
+        x: this.x,
+        y: this.y,
+        width: this.opts.width,
+        height: this.opts.height,
+        imgWidth: this.$img.width(),
+        imgHeight: this.$img.height()
+      };
+      var custom = this.opts.paramsFn.call(this, defaultParams);
+      return $.extend(defaultParams, custom);
     },
 
     /**
@@ -263,6 +429,7 @@
       if (!$.isArray(tags)) {
         tags = [tags];
       }
+      this.tags = this.tags.concat(tags);
       for (var i = 0, ln = tags.length; i < ln; ++i) {
         this.appendTag(tags[i]);
       }
@@ -316,6 +483,10 @@
     /** Unbind user events. */
     unbind: function() {
       this.$tags.off(NAMESPACE);
+      if (this.$form) {
+        this.$img.off(NAMESPACE);
+        this.$form.off(NAMESPACE);
+      }
     },
 
     /** Destroy phototagging object */
@@ -323,6 +494,11 @@
       this.unbind();
       this.$tags.remove();
       this.$wrapper.unwrap();
+
+      if (this.$form) {
+        this.$input.remove();
+        this.$form.remove();
+      }
 
       for (var i in this) {
         if (this.hasOwnProperty(i)) {
@@ -360,14 +536,22 @@
   $.fn.jqPhotoTagging.options = {
     width: 100,
     height: 100,
+    url: '',
+    method: 'POST',
+    dataType: 'json',
+    readOnly: false,
     label: renderAttribute,
     tagSize: tagSize,
     imgSize: imgSize,
     ratio: ratio,
     tags: [],
     $tags: null,
+    paramsFn: identity,
+    resultFn: identity,
     onInitialized: noop,
-    onLoaded: noop
+    onLoaded: noop,
+    onSavedSuccess: noop,
+    onSavedFailed: noop
   };
 
 })(jQuery);
