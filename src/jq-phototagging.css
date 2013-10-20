@@ -27,6 +27,10 @@
 
 .jq-phototagging-wrapper {
   position: relative;
+  overflow: hidden;
+
+  display: inline-block;
+  *zoom: 1;
 }
 
 .jq-phototagging-img {
@@ -44,7 +48,10 @@
 
 .jq-phototagging-form {
   position: absolute;
+  display: none;
+}
 
+.jq-phototagging-form.jq-phototagging-visible {
   display: inline-block;
   *zoom: 1;
 }
@@ -56,7 +63,7 @@
 
 .jq-phototagging-form-box,
 .jq-phototagging-tag-box:hover,
-.jq-phototagging-visible {
+.jq-phototagging-tag-box.jq-phototagging-visible {
   border: solid 2px #fff;
 
      -moz-border-radius: 3px;

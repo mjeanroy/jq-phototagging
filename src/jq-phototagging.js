@@ -329,7 +329,20 @@
         var that = this;
 
         this.$img.on('click' + NAMESPACE, function(e) {
-          that.showForm(e.pageX, e.pageY);
+          e.stopPropagation();
+
+          var $this = $(this);
+          var $window = $(window);
+          var offset = $this.offset();
+          var top = offset.top - $window.scrollTop();
+          var left = offset.left - $window.scrollLeft();
+
+          var width = that.opts.width / 2;
+          var height = that.opts.height / 2;
+          var x = e.pageX - left - width;
+          var y = e.pageY - top - height;
+
+          that.showForm(x, y);
         });
 
         this.$form.on('submit' + NAMESPACE, function(e) {
@@ -338,6 +351,10 @@
           if (val) {
             that.submitForm(val);
           }
+        });
+
+        $(document).on('click' + NAMESPACE, function() {
+          that.hideForm();
         });
       }
     },
@@ -352,13 +369,13 @@
         top: y
       });
 
-      this.$form.show();
+      this.$form.addClass(CSS_VISIBLE);
       this.$input.focus();
     },
 
     /** Hide form used to type a new tag. */
     hideForm: function() {
-      this.$form.hide();
+      this.$form.removeClass(CSS_VISIBLE);
     },
 
     /**

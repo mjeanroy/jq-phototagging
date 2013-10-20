@@ -316,11 +316,18 @@ describe("jQuery PhotoTagging Test Suite", function() {
 
       it("should show form if user click on image", function() {
         spyOn(this.$photo, 'showForm');
+
         var event = jQuery.Event('click');
-        event.pageX = 10;
-        event.pageY = 20;
+        event.pageX = 200;
+        event.pageY = 150;
+
+        spyOn($.fn, 'scrollTop').andReturn(50);
+        spyOn($.fn, 'scrollLeft').andReturn(20);
+
         this.$img.trigger(event);
-        expect(this.$photo.showForm).toHaveBeenCalledWith(10, 20);
+        expect(this.$photo.showForm).toHaveBeenCalledWith(170, 100);
+        expect($.fn.scrollTop).toHaveBeenCalled();
+        expect($.fn.scrollLeft).toHaveBeenCalled();
       });
 
       it("should submit form if user submit a value", function() {
@@ -352,13 +359,16 @@ describe("jQuery PhotoTagging Test Suite", function() {
           top: 20,
           left: 10
         });
-        expect(this.$form.show).toHaveBeenCalled();
+        expect(this.$form.hasClass('jq-phototagging-visible')).toBe(true);
+        expect(this.$form.show).not.toHaveBeenCalled();
         expect(this.$input.focus).toHaveBeenCalled();
       });
 
       it("should hide form", function() {
+        this.$form.addClass('jq-phototagging-visible');
         this.$photo.hideForm();
-        expect(this.$form.hide).toHaveBeenCalled();
+        expect(this.$form.hide).not.toHaveBeenCalled();
+        expect(this.$form.hasClass('jq-phototagging-visible')).toBe(false);
       });
 
       it("should not submit if form is submitting", function() {
