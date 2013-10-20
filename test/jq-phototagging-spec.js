@@ -318,8 +318,8 @@ describe("jQuery PhotoTagging Test Suite", function() {
         spyOn(this.$photo, 'showForm');
 
         var event = jQuery.Event('click');
-        event.pageX = 200;
-        event.pageY = 150;
+        event.clientX = 200;
+        event.clientY = 150;
 
         spyOn($.fn, 'scrollTop').andReturn(50);
         spyOn($.fn, 'scrollLeft').andReturn(20);

@@ -339,8 +339,8 @@
 
           var width = that.opts.width / 2;
           var height = that.opts.height / 2;
-          var x = e.pageX - left - width;
-          var y = e.pageY - top - height;
+          var x = e.clientX - left - width;
+          var y = e.clientY - top - height;
 
           that.showForm(x, y);
         });
