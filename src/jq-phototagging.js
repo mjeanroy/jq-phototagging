@@ -299,19 +299,24 @@
         $wrapper.addClass(CSS_RO);
       }
 
-      this.bind();
-
       this.opts.onInitialized.call(this, this.$wrapper, this.$form);
 
       imageLoaded(
         this.$img,
-        function() {
-          this.$tags.html('');
-          this.appendTags(this.opts.tags || []);
-          this.opts.onLoaded.call(this, this.tags, this.$tags);
-        },
+        this.onLoaded,
         this
       );
+    },
+
+    onLoaded: function() {
+      this.$imgHeight = this.$img.height();
+      this.$imgWidth = this.$img.width();
+
+      this.$tags.html('');
+      this.appendTags(this.opts.tags || []);
+      this.opts.onLoaded.call(this, this.tags, this.$tags);
+
+      this.bind();
     },
 
     /** Bind user events. */
@@ -365,6 +370,26 @@
 
     /** Display form used to type a new tag. */
     showForm: function(x, y) {
+      // Fix position in image
+      if (x < 0) {
+        x = 0;
+      }
+      if (y  < 0) {
+        y = 0;
+      }
+
+      var width = this.opts.width;
+      var height = this.opts.height;
+      var x2 = x + width;
+      var y2 = y + height;
+
+      if (x2 > this.$imgWidth) {
+        x = this.$imgWidth - width;
+      }
+      if (y2 > this.$imgHeight) {
+        y = this.$imgHeight - height;
+      }
+
       this.x = x;
       this.y = y;
 
@@ -435,8 +460,8 @@
         y: this.y,
         width: this.opts.width,
         height: this.opts.height,
-        imgWidth: this.$img.width(),
-        imgHeight: this.$img.height()
+        imgWidth: this.$imgWidth,
+        imgHeight: this.$imgHeight
       };
       var custom = this.opts.paramsFn.call(this, defaultParams);
       return $.extend(defaultParams, custom);

@@ -49,11 +49,11 @@
 .jq-phototagging-form {
   position: absolute;
   display: none;
+  margin: 0;
 }
 
 .jq-phototagging-form.jq-phototagging-visible {
-  display: inline-block;
-  *zoom: 1;
+  display: block;
 }
 
 .jq-phototagging-form input {

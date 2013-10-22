@@ -9,8 +9,12 @@
   <link rel="stylesheet" href="jq-phototagging.css"/>
 
   <style>
-    .pic-tags {
-      overflow: hidden;
+    .pic-tags:after {
+      content: ".";
+      visibility: hidden;
+      display: block;
+      height: 0;
+      clear: both;
     }
 
     .pic {
