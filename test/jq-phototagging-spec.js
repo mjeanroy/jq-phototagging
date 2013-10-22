@@ -507,8 +507,11 @@ describe("jQuery PhotoTagging Test Suite", function() {
         expect($box).toBeDefined();
         expect($box.length).toBe(1);
         expect($box.hasClass('jq-phototagging-tag-box')).toBe(true);
-        expect($box.attr('id')).toBeDefined();
-        expect($box.attr('id')).not.toBe('');
+
+        var $id = $box.attr('id');
+        expect($id).toBeDefined();
+        expect($id).not.toBe('');
+        expect(this.$photo.$ids[$id]).toBe(true);
 
         var widthTag = this.tag.width / ratio;
         var heightTag = this.tag.height / ratio;
@@ -525,7 +528,7 @@ describe("jQuery PhotoTagging Test Suite", function() {
         expect($tag.hasClass('jq-phototagging-tag')).toBe(true);
         expect($tag.attr('data-id')).toBeDefined();
         expect($tag.attr('data-id')).not.toBe('');
-        expect($tag.attr('data-id')).toBe($box.attr('id'));
+        expect($tag.attr('data-id')).toBe($id);
       });
 
       it("should append tag using custom size functions", function() {

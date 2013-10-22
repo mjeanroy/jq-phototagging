@@ -126,8 +126,15 @@
   };
 
   /** Generate a unique id */
-  var uniqId = function() {
-    return Math.round(new Date().getTime() + (Math.random() * 100));
+  var uniqId = function($ids) {
+    var exist = true;
+    var $id = '';
+    while (exist) {
+      $id = Math.round(new Date().getTime() + (Math.random() * 100));
+      $id = $id.toString();
+      exist = $ids.hasOwnProperty($id) || $('#' + $id).length > 0;
+    }
+    return $id;
   };
 
   /**
@@ -227,6 +234,7 @@
     this.x = 0;
     this.y = 0;
 
+    this.$ids = {};
     this.tags = [];
   };
 
@@ -461,7 +469,8 @@
       var tagSize = this.opts.tagSize.call(tag, tag);
       var ratio = this.opts.ratio.call(tag, imgSize, tagSize, this.$img);
 
-      var id = uniqId();
+      var id = uniqId(this.$ids);
+      this.$ids[id] = true;
 
       $('<div></div>')
         .addClass(CSS_TAG_BOX)
