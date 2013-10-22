@@ -360,10 +360,6 @@
             that.submitForm(val);
           }
         });
-
-        $(document).on('click' + NAMESPACE, function() {
-          that.hideForm();
-        });
       }
     },
 
