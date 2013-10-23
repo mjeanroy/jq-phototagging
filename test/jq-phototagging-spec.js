@@ -285,6 +285,7 @@ describe("jQuery PhotoTagging Test Suite", function() {
       this.$tags = this.$photo.$tags;
       this.$form = this.$photo.$form;
       this.$input = this.$photo.$input;
+      this.$iconRemove = this.$photo.$iconRemove;
     });
 
     describe("User Events", function() {
@@ -302,6 +303,7 @@ describe("jQuery PhotoTagging Test Suite", function() {
         expect(this.$img.on).toHaveBeenCalledWith('click.jqphototagging', jasmine.any(Function));
         expect(this.$form.on).toHaveBeenCalledWith('submit.jqphototagging', jasmine.any(Function));
         expect(this.$input.on).toHaveBeenCalledWith('keyup.jqphototagging', jasmine.any(Function));
+        expect(this.$iconRemove.on).toHaveBeenCalledWith('click.jqphototagging', jasmine.any(Function));
       });
 
       it("should not bind user events on form when tag is readonly", function() {
@@ -338,6 +340,13 @@ describe("jQuery PhotoTagging Test Suite", function() {
         var event = jQuery.Event('keyup');
         event.keyCode = 27;
         this.$input.trigger(event);
+        expect(this.$photo.hideForm).toHaveBeenCalled();
+      });
+
+      it("should hide form when user click on remove icon", function() {
+        spyOn(this.$photo, 'hideForm');
+
+        this.$iconRemove.trigger('click');
         expect(this.$photo.hideForm).toHaveBeenCalled();
       });
     });
@@ -791,10 +800,13 @@ describe("jQuery PhotoTagging Test Suite", function() {
         var $tags = this.$photo.$tags;
         var $form = this.$photo.$form;
         var $img = this.$photo.$img;
+        var $iconRemove = this.$photo.$iconRemove;
+
         this.$photo.unbind();
         expect($tags.off).toHaveBeenCalledWith('.jqphototagging');
         expect($form.off).toHaveBeenCalledWith('.jqphototagging');
         expect($img.off).toHaveBeenCalledWith('.jqphototagging');
+        expect($iconRemove.off).toHaveBeenCalledWith('.jqphototagging');
       });
 
       it("should unbind user events without form", function() {

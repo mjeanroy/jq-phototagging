@@ -130,6 +130,13 @@
    */
   var CSS_RO = CSS_PREFIX + 'readonly';
 
+  /**
+   * Css class added on icon used to remove tags.
+   * @type {string}
+   * @const
+   */
+  var CSS_ICON_REMOVE = 'icon-remove icon-white';
+
   /** No op function */
   var noop = function() {
   };
@@ -332,9 +339,14 @@
       var $input = $('<input type="text"/>')
         .appendTo($form);
 
+      var $iconRemove = $('<i></i>')
+        .addClass(CSS_ICON_REMOVE)
+        .appendTo($box);
+
       this.$form = $form;
       this.$input = $input;
       this.$box = $box;
+      this.$iconRemove = $iconRemove;
     },
 
     /** Called when image is fully loaded */
@@ -426,6 +438,10 @@
             that.hideForm();
           }
         });
+
+        this.$iconRemove.on('click' + NAMESPACE, function(e) {
+          that.hideForm();
+        });
       }
     },
 
@@ -433,6 +449,7 @@
     unbindForm: function() {
       this.$img.off('click' + NAMESPACE);
       this.$form.unbind(NAMESPACE);
+      this.$iconRemove.off(NAMESPACE);
     },
 
     /** Display form used to type a new tag. */
