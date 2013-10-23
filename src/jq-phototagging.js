@@ -607,21 +607,34 @@
       var id = uniqId(this.$ids);
       this.$ids[id] = true;
 
-      $('<div></div>')
+      var width = ratio.width;
+
+      var $tagBox = $('<div></div>')
         .addClass(CSS_TAG_BOX)
         .attr('id', id)
         .css({
-          left: ratio.x,
+          width: width,
           top: ratio.y,
-          width: ratio.width,
-          height: ratio.height
+          left: ratio.x
         })
         .appendTo(this.$boxes);
+
+      $('<div></div>')
+        .css({
+          height: ratio.height
+        })
+        .appendTo($tagBox);
+
+      var label = this.renderTag(tag);
+
+      $('<span></span>')
+        .html(label)
+        .appendTo($tagBox);
 
       var $li = $('<li></li>')
         .addClass(CSS_TAG)
         .attr('data-id', id)
-        .html(this.renderTag(tag));
+        .html(label);
 
       this.$tags.append($li);
     },

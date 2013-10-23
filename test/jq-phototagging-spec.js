@@ -229,10 +229,18 @@ describe("jQuery PhotoTagging Test Suite", function() {
       expect($tag1.hasClass('jq-phototagging-tag')).toBe(true);
       expect($tag1.html()).toBe('my tag');
 
-      var $box1 = $boxes.find('div');
+      var $box1 = $boxes.find('> div');
       expect($box1).toBeDefined();
       expect($box1.length).toBe(1);
       expect($box1.hasClass('jq-phototagging-tag-box')).toBe(true);
+
+      var $divBox1 = $box1.find('> div');
+      expect($divBox1).toBeDefined();
+      expect($divBox1.length).toBe(1);
+
+      var $spanBox1 = $box1.find('> div');
+      expect($spanBox1).toBeDefined();
+      expect($spanBox1.length).toBe(1);
 
       var $form = $wrapper.find('form');
       expect($form).toBeDefined();
@@ -718,10 +726,19 @@ describe("jQuery PhotoTagging Test Suite", function() {
 
         this.$photo.appendTag(this.tag);
 
-        var $box = this.$boxes.find('div');
+        var $box = this.$boxes.find('> div');
         expect($box).toBeDefined();
         expect($box.length).toBe(1);
         expect($box.hasClass('jq-phototagging-tag-box')).toBe(true);
+
+        var $divBox = $box.find('> div');
+        expect($divBox).toBeDefined();
+        expect($divBox.length).toBe(1);
+
+        var $spanBox = $box.find('> span');
+        expect($spanBox).toBeDefined();
+        expect($spanBox.length).toBe(1);
+        expect($spanBox.html()).toBe('my tag');
 
         var $id = $box.attr('id');
         expect($id).toBeDefined();
@@ -735,11 +752,12 @@ describe("jQuery PhotoTagging Test Suite", function() {
         expect($box.css('left')).toBe(xTag + 'px');
         expect($box.css('top')).toBe(yTag + 'px');
         expect($box.css('width')).toBe(widthTag + 'px');
-        expect($box.css('height')).toBe(heightTag + 'px');
+        expect($divBox.css('height')).toBe(heightTag + 'px');
 
         var $tag = this.$tags.find('li');
         expect($tag).toBeDefined();
         expect($tag.length).toBe(1);
+        expect($tag.html()).toBe('my tag');
         expect($tag.hasClass('jq-phototagging-tag')).toBe(true);
         expect($tag.attr('data-id')).toBeDefined();
         expect($tag.attr('data-id')).not.toBe('');
@@ -764,11 +782,15 @@ describe("jQuery PhotoTagging Test Suite", function() {
 
         this.$photo.appendTag(this.tag);
 
-        var $box = this.$boxes.find('div');
+        var $box = this.$boxes.find('> div');
+        var $divBox = $box.find('> div');
+        var $spanBox = $box.find('> span');
+
         expect($box.css('left')).toBe('0px');
         expect($box.css('top')).toBe('0px');
         expect($box.css('width')).toBe('50px');
-        expect($box.css('height')).toBe('50px');
+        expect($divBox.css('height')).toBe('50px');
+        expect($spanBox.html()).toBe('my tag');
 
         expect(this.$photo.opts.imgSize).toHaveBeenCalledWith(this.tag);
         expect(this.$photo.opts.tagSize).toHaveBeenCalledWith(this.tag);

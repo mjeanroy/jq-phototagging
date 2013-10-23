@@ -41,11 +41,6 @@
   cursor: default;
 }
 
-.jq-phototagging-tag-box {
-  position: absolute;
-  cursor: default;
-}
-
 .jq-phototagging-form {
   position: absolute;
   display: none;
@@ -72,9 +67,14 @@
   margin-right: 0;
 }
 
+.jq-phototagging-tag-box {
+  position: absolute;
+  cursor: default;
+}
+
 .jq-phototagging-form-box,
-.jq-phototagging-tag-box:hover,
-.jq-phototagging-tag-box.jq-phototagging-visible {
+.jq-phototagging-tag-box:hover > div,
+.jq-phototagging-tag-box.jq-phototagging-visible > div {
   border: solid 2px #fff;
   background-color: #000;
 
@@ -84,6 +84,30 @@
      -moz-border-radius: 3px;
   -webkit-border-radius: 3px;
           border-radius: 3px;
+}
+
+.jq-phototagging-tag-box:hover > span,
+.jq-phototagging-tag-box.jq-phototagging-visible > span {
+  display: block;
+}
+
+.jq-phototagging-tag-box > span {
+  display: none;
+
+  width: 100%;
+  margin: 3px 0 0 0;
+  padding: 1px 0;
+
+  text-align: center;
+
+  background-color: #000;
+  opacity: 0.8;
+  filter : alpha(opacity=80);
+  color: #fff;
+
+     -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+          border-radius: 5px;
 }
 
 .jq-phototagging-wrapper .icon-remove {
