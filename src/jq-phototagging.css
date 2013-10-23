@@ -52,10 +52,6 @@
   margin: 0;
 }
 
-.jq-phototagging-form.jq-phototagging-visible {
-  display: block;
-}
-
 .jq-phototagging-form input {
   padding: 0;
   margin: 0;

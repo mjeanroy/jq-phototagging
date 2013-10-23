@@ -30,6 +30,7 @@ describe("jQuery PhotoTagging Test Suite", function() {
     spyOn($.fn, 'focus').andCallThrough();
     spyOn($.fn, 'show').andCallThrough();
     spyOn($.fn, 'hide').andCallThrough();
+    spyOn($.fn, 'fadeOut').andCallThrough();
     spyOn($.fn, 'val').andCallThrough();
     spyOn($.fn, 'offset').andCallThrough();
     spyOn($.fn, 'scrollTop').andCallThrough();
@@ -465,10 +466,9 @@ describe("jQuery PhotoTagging Test Suite", function() {
           left: 400
         });
 
-        expect(this.$form.hasClass('jq-phototagging-visible')).toBe(true);
         expect(this.$box.hasClass('jq-phototagging-left')).toBe(false);
         expect(this.$box.hasClass('jq-phototagging-right')).toBe(false);
-        expect(this.$form.show).not.toHaveBeenCalled();
+        expect(this.$form.show).toHaveBeenCalled();
         expect(this.$input.focus).toHaveBeenCalled();
       });
 
@@ -485,10 +485,9 @@ describe("jQuery PhotoTagging Test Suite", function() {
           left: 300
         });
 
-        expect(this.$form.hasClass('jq-phototagging-visible')).toBe(true);
         expect(this.$box.hasClass('jq-phototagging-left')).toBe(false);
         expect(this.$box.hasClass('jq-phototagging-right')).toBe(false);
-        expect(this.$form.show).not.toHaveBeenCalled();
+        expect(this.$form.show).toHaveBeenCalled();
         expect(this.$input.focus).toHaveBeenCalled();
       });
 
@@ -503,10 +502,9 @@ describe("jQuery PhotoTagging Test Suite", function() {
           left: 0
         });
 
-        expect(this.$form.hasClass('jq-phototagging-visible')).toBe(true);
         expect(this.$box.hasClass('jq-phototagging-left')).toBe(true);
         expect(this.$box.hasClass('jq-phototagging-right')).toBe(false);
-        expect(this.$form.show).not.toHaveBeenCalled();
+        expect(this.$form.show).toHaveBeenCalled();
         expect(this.$input.focus).toHaveBeenCalled();
       });
 
@@ -521,10 +519,9 @@ describe("jQuery PhotoTagging Test Suite", function() {
           left: 700
         });
 
-        expect(this.$form.hasClass('jq-phototagging-visible')).toBe(true);
         expect(this.$box.hasClass('jq-phototagging-left')).toBe(false);
         expect(this.$box.hasClass('jq-phototagging-right')).toBe(true);
-        expect(this.$form.show).not.toHaveBeenCalled();
+        expect(this.$form.show).toHaveBeenCalled();
         expect(this.$input.focus).toHaveBeenCalled();
       });
 
@@ -539,10 +536,9 @@ describe("jQuery PhotoTagging Test Suite", function() {
           left: 300
         });
 
-        expect(this.$form.hasClass('jq-phototagging-visible')).toBe(true);
         expect(this.$box.hasClass('jq-phototagging-left')).toBe(false);
         expect(this.$box.hasClass('jq-phototagging-right')).toBe(false);
-        expect(this.$form.show).not.toHaveBeenCalled();
+        expect(this.$form.show).toHaveBeenCalled();
         expect(this.$input.focus).toHaveBeenCalled();
       });
 
@@ -557,18 +553,16 @@ describe("jQuery PhotoTagging Test Suite", function() {
           left: 300
         });
 
-        expect(this.$form.hasClass('jq-phototagging-visible')).toBe(true);
         expect(this.$box.hasClass('jq-phototagging-left')).toBe(false);
         expect(this.$box.hasClass('jq-phototagging-right')).toBe(false);
-        expect(this.$form.show).not.toHaveBeenCalled();
+        expect(this.$form.show).toHaveBeenCalled();
         expect(this.$input.focus).toHaveBeenCalled();
       });
 
       it("should hide form", function() {
         this.$form.addClass('jq-phototagging-visible');
         this.$photo.hideForm();
-        expect(this.$form.hide).not.toHaveBeenCalled();
-        expect(this.$form.hasClass('jq-phototagging-visible')).toBe(false);
+        expect(this.$form.fadeOut).toHaveBeenCalled();
       });
 
       it("should not submit if form is submitting", function() {

@@ -495,13 +495,13 @@
         top: fy
       });
 
-      this.$form.addClass(CSS_VISIBLE);
+      this.$form.show();
       this.$input.focus();
     },
 
     /** Hide form used to type a new tag. */
     hideForm: function() {
-      this.$form.removeClass(CSS_VISIBLE);
+      this.$form.fadeOut('fast');
     },
 
     /**
