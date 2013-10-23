@@ -110,6 +110,20 @@
   var CSS_FORM_BOX = CSS_PREFIX + 'form-box';
 
   /**
+   * Css class added when box is displayed at the right side of tag form.
+   * @type {string}
+   * @const
+   */
+  var CSS_RIGHT = CSS_PREFIX + 'right';
+
+  /**
+   * Css class added when box is displayed at the left side of tag form.
+   * @type {string}
+   * @const
+   */
+  var CSS_LEFT = CSS_PREFIX + 'left';
+
+  /**
    * Css class added on wrapper when image is read-only (cannot add new tag).
    * @type {string}
    * @const
@@ -231,6 +245,16 @@
     this.$img = $(img);
     this.opts = options;
 
+    // Position of form used to tag images
+    this.fx = 0;
+
+    // Default width of box used to tag images
+    this.width = options.width;
+    this.height = options.height;
+
+    // Position of tag
+    // May be different than position of form (if form is larger
+    // than a tag)
     this.x = 0;
     this.y = 0;
 
@@ -243,6 +267,7 @@
     init: function() {
       var $img = this.$img;
 
+      // Add css class on image
       $img.addClass(CSS_IMG);
 
       // Wrap image (to get relative position position)
@@ -274,26 +299,8 @@
       this.$boxes = $boxes;
 
       if (!this.opts.readOnly) {
-        var $form = $('<form></form>')
-          .addClass(CSS_FORM)
-          .appendTo($wrapper);
-
-        $('<div></div>')
-          .addClass(CSS_FORM_BOX)
-          .css({
-            width: this.opts.width,
-            height: this.opts.height
-          })
-          .appendTo($form);
-
-        var $input = $('<input type="text"/>')
-          .css({
-            width: this.opts.width
-          })
-          .appendTo($form);
-
-        this.$form = $form;
-        this.$input = $input;
+        // Append form used to tag image
+        this.appendForm();
       }
       else {
         $wrapper.addClass(CSS_RO);
@@ -308,15 +315,61 @@
       );
     },
 
+    /** Append form used to tag image */
+    appendForm: function() {
+      var $form = $('<form></form>')
+        .addClass(CSS_FORM)
+        .appendTo(this.$wrapper);
+
+      var $box = $('<div></div>')
+        .addClass(CSS_FORM_BOX)
+        .css({
+          width: this.width,
+          height: this.height
+        })
+        .appendTo($form);
+
+      var $input = $('<input type="text"/>')
+        .appendTo($form);
+
+      this.$form = $form;
+      this.$input = $input;
+      this.$box = $box;
+    },
+
+    /** Called when image is fully loaded */
     onLoaded: function() {
-      this.$imgHeight = this.$img.height();
-      this.$imgWidth = this.$img.width();
+      this.computeSize();
 
       this.$tags.html('');
       this.appendTags(this.opts.tags || []);
       this.opts.onLoaded.call(this, this.tags, this.$tags);
 
       this.bind();
+    },
+
+    /** Refresh size of image and size of form */
+    computeSize: function() {
+      this.$imgHeight = this.$img.outerHeight();
+      this.$imgWidth = this.$img.outerWidth();
+
+      var formWidth = 0;
+      var formHeight = 0;
+      var marginWidth = 0;
+
+      if (this.$form) {
+        formWidth = this.$form.outerWidth();
+        formHeight = this.$form.outerHeight();
+
+        marginWidth = (formWidth - this.width) / 2;
+        if (marginWidth < 0) {
+          marginWidth = 0;
+        }
+      }
+
+      this.marginWidth = marginWidth;
+      this.formWidth = formWidth;
+      this.formHeight = formHeight;
     },
 
     /** Bind user events. */
@@ -350,8 +403,9 @@
           var top = offset.top - $window.scrollTop();
           var left = offset.left - $window.scrollLeft();
 
-          var width = that.opts.width / 2;
-          var height = that.opts.height / 2;
+          var width = that.formWidth / 2;
+          var height = that.formHeight / 2;
+
           var x = e.clientX - left - width;
           var y = e.clientY - top - height;
 
@@ -368,34 +422,70 @@
       }
     },
 
+    /** Unbind events used to tag image */
+    unbindForm: function() {
+      this.$img.off('click' + NAMESPACE);
+      this.$form.unbind(NAMESPACE);
+    },
+
     /** Display form used to type a new tag. */
-    showForm: function(x, y) {
-      // Fix position in image
-      if (x < 0) {
+    showForm: function(fx, fy) {
+      // Fix form position in image
+      var formWidth = this.formWidth;
+
+      // Fix box position in image
+      var width = this.width;
+      var height = this.height;
+
+      // Keep local variable
+      var $box = this.$box;
+      var $imgWidth = this.$imgWidth;
+      var $imgHeight = this.$imgHeight;
+
+      // Remove 'left', 'right' css
+      $box
+        .removeClass(CSS_LEFT)
+        .removeClass(CSS_RIGHT);
+
+      var x = fx + this.marginWidth;
+      var y = fy;
+
+      // If form is on the left
+      if (fx < 0) {
+        fx = 0;
         x = 0;
+        $box.addClass(CSS_LEFT);
       }
-      if (y  < 0) {
+
+      // If form is at the bottom
+      if (fy < 0) {
+        fy = 0;
         y = 0;
       }
 
-      var width = this.opts.width;
-      var height = this.opts.height;
-      var x2 = x + width;
-      var y2 = y + height;
+      var x2 = fx + formWidth;
+      var y2 = fy + height;
 
-      if (x2 > this.$imgWidth) {
-        x = this.$imgWidth - width;
-      }
-      if (y2 > this.$imgHeight) {
-        y = this.$imgHeight - height;
+      // If form is on the right
+      if (x2 > $imgWidth) {
+        fx = $imgWidth - formWidth;
+        x = $imgWidth - width;
+        $box.addClass(CSS_RIGHT);
       }
 
+      // If form is at the top
+      if (y2 > $imgHeight) {
+        fy = $imgHeight - height;
+        y = $imgHeight - height;
+      }
+
+      this.fx = fx;
       this.x = x;
       this.y = y;
 
       this.$form.css({
-        left: x,
-        top: y
+        left: fx,
+        top: fy
       });
 
       this.$form.addClass(CSS_VISIBLE);
@@ -458,8 +548,8 @@
         value: value,
         x: this.x,
         y: this.y,
-        width: this.opts.width,
-        height: this.opts.height,
+        width: this.width,
+        height: this.height,
         imgWidth: this.$imgWidth,
         imgHeight: this.$imgHeight
       };
@@ -531,8 +621,7 @@
     unbind: function() {
       this.$tags.off(NAMESPACE);
       if (this.$form) {
-        this.$img.off(NAMESPACE);
-        this.$form.off(NAMESPACE);
+        this.unbindForm();
       }
     },
 

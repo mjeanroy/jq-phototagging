@@ -31,6 +31,9 @@ describe("jQuery PhotoTagging Test Suite", function() {
     spyOn($.fn, 'show').andCallThrough();
     spyOn($.fn, 'hide').andCallThrough();
     spyOn($.fn, 'val').andCallThrough();
+    spyOn($.fn, 'offset').andCallThrough();
+    spyOn($.fn, 'scrollTop').andCallThrough();
+    spyOn($.fn, 'scrollLeft').andCallThrough();
   });
 
   describe("jQuery Phototagging: initialization", function() {
@@ -142,10 +145,14 @@ describe("jQuery PhotoTagging Test Suite", function() {
       expect($wrapper).toBeDefined();
       expect($wrapper.length).toBe(1);
       expect($wrapper.hasClass('jq-phototagging-readonly')).toBe(false);
+      expect($wrapper.get(0)).not.toEqual(this.$fixtures.get(0));
+      expect($wrapper.get(0)).toEqual($photo.$wrapper.get(0));
 
       var $tags = this.$img.next();
       expect($tags).toBeDefined();
       expect($tags.length).toBe(1);
+      expect($tags.get(0)).toEqual(this.$fixtures.find('ul').get(0));
+      expect($tags.get(0)).toEqual($photo.$tags.get(0));
 
       var $boxes = $tags.next();
       expect($boxes).toBeDefined();
@@ -230,10 +237,34 @@ describe("jQuery PhotoTagging Test Suite", function() {
       expect($form).toBeDefined();
       expect($form.length).toBe(0);
       expect($photo.$form).toBeUndefined();
+      expect($photo.$box).toBeUndefined();
       expect($photo.$input).toBeUndefined();
 
       expect(onInitialized).toHaveBeenCalledWith($photo.$wrapper, undefined);
       expect(onLoaded).toHaveBeenCalledWith($photo.tags, $photo.$tags);
+    });
+
+    it("should initialize plugin with needed variable when form is not readonly", function() {
+      this.$img.jqPhotoTagging();
+
+      var $photo = this.$img.data('jqPhotoTagging');
+      expect($photo.fx).toBe(0);
+      expect($photo.x).toBe(0);
+      expect($photo.y).toBe(0);
+      expect($photo.width).toBe(100);
+      expect($photo.height).toBe(100);
+      expect($photo.$ids).toEqual({});
+
+      expect($photo.$imgWidth).toBeUndefined();
+      expect($photo.$imgHeight).toBeUndefined();
+
+      // trigger images loaded event
+      spyOn($photo, 'computeSize').andCallThrough();
+      this.$img.trigger('load');
+
+      expect($photo.computeSize).toHaveBeenCalled();
+      expect($photo.$imgWidth).toBeDefined();
+      expect($photo.$imgHeight).toBeDefined();
     });
   });
 
@@ -248,6 +279,7 @@ describe("jQuery PhotoTagging Test Suite", function() {
       this.$img.trigger('load');
 
       this.$photo = this.$img.data('jqPhotoTagging');
+      this.$box = this.$photo.$box;
       this.$boxes = this.$photo.$boxes;
       this.$tags = this.$photo.$tags;
       this.$form = this.$photo.$form;
@@ -287,18 +319,50 @@ describe("jQuery PhotoTagging Test Suite", function() {
       });
     });
 
+    describe("Compute Size", function() {
+      it("should compute size with form", function() {
+        this.$photo.width = 20;
+        spyOn(this.$photo.$img, 'outerHeight').andReturn(100);
+        spyOn(this.$photo.$img, 'outerWidth').andReturn(200);
+
+        spyOn(this.$photo.$form, 'outerHeight').andReturn(50);
+        spyOn(this.$photo.$form, 'outerWidth').andReturn(60);
+
+        this.$photo.computeSize();
+        expect(this.$photo.$imgHeight).toBe(100);
+        expect(this.$photo.$imgWidth).toBe(200);
+        expect(this.$photo.formWidth).toBe(60);
+        expect(this.$photo.formHeight).toBe(50);
+        expect(this.$photo.marginWidth).toBe(20);
+      });
+
+      it("should compute size without form", function() {
+        this.$photo.$form = undefined;
+        spyOn(this.$photo.$img, 'outerHeight').andReturn(100);
+        spyOn(this.$photo.$img, 'outerWidth').andReturn(200);
+
+        this.$photo.computeSize();
+        expect(this.$photo.$imgHeight).toBe(100);
+        expect(this.$photo.$imgWidth).toBe(200);
+        expect(this.$photo.formWidth).toBe(0);
+        expect(this.$photo.formHeight).toBe(0);
+        expect(this.$photo.marginWidth).toBe(0);
+      });
+    });
+
     describe("Tag Form", function() {
       beforeEach(function() {
         this.xhr = jasmine.createSpyObj('xhr', ['done', 'fail', 'always']);
         spyOn($, 'ajax').andReturn(this.xhr);
 
         this.$photo.opts.url = '/foo';
-        this.$photo.opts.width = 100;
-        this.$photo.opts.height = 200;
-        this.$photo.x = 10;
-        this.$photo.y = 20;
-        this.$photo.$img.width.andReturn(50);
-        this.$photo.$img.height.andReturn(60);
+
+        this.$photo.$imgWidth = 800;
+        this.$photo.$imgHeight = 500;
+        this.$photo.width = 100;
+        this.$photo.height = 100;
+        this.$photo.marginWidth = 0;
+        this.$photo.formWidth = this.$photo.width;
 
         spyOn(this.$photo, 'appendTags').andCallThrough();
         spyOn(this.$photo, 'hideForm').andCallThrough();
@@ -317,15 +381,30 @@ describe("jQuery PhotoTagging Test Suite", function() {
       it("should show form if user click on image", function() {
         spyOn(this.$photo, 'showForm');
 
+        this.$photo.formWidth = 50;
+        this.$photo.formHeight = 100;
+
+        $.fn.offset.andReturn({
+          top: 50,
+          left: 100
+        });
+
+        $.fn.scrollTop.andReturn(10);
+        $.fn.scrollLeft.andReturn(30);
+
         var event = jQuery.Event('click');
         event.clientX = 200;
         event.clientY = 150;
 
-        spyOn($.fn, 'scrollTop').andReturn(50);
-        spyOn($.fn, 'scrollLeft').andReturn(20);
-
         this.$img.trigger(event);
-        expect(this.$photo.showForm).toHaveBeenCalledWith(170, 100);
+
+        // Expected x = clientX - (offset.left - scrollLeft) - formWidth / 2
+        //            = 200 - (100 - 30) - (50 / 2) = 105
+        // Expected y = clientY - (offset.top - scrollTop) - formHeight / 2
+        //            = 150 - (50 - 10) - (100 / 2) = 60
+
+        expect(this.$photo.showForm).toHaveBeenCalledWith(105, 60);
+        expect($.fn.offset).toHaveBeenCalled();
         expect($.fn.scrollTop).toHaveBeenCalled();
         expect($.fn.scrollLeft).toHaveBeenCalled();
       });
@@ -351,15 +430,114 @@ describe("jQuery PhotoTagging Test Suite", function() {
         expect(this.$photo.submitForm).not.toHaveBeenCalled();
       });
 
-      it("should show form at given position", function() {
-        this.$photo.showForm(10, 20);
-        expect(this.$photo.x).toBe(10);
-        expect(this.$photo.y).toBe(20);
+      it("should show form at given position when form width is equal to box width", function() {
+        var x = 400;
+        var y = 200;
+        this.$photo.showForm(x, y);
+
+        expect(this.$photo.fx).toBe(400);
+        expect(this.$photo.x).toBe(400);
+        expect(this.$photo.y).toBe(200);
         expect(this.$form.css).toHaveBeenCalledWith({
-          top: 20,
-          left: 10
+          top: 200,
+          left: 400
         });
+
         expect(this.$form.hasClass('jq-phototagging-visible')).toBe(true);
+        expect(this.$box.hasClass('jq-phototagging-left')).toBe(false);
+        expect(this.$box.hasClass('jq-phototagging-right')).toBe(false);
+        expect(this.$form.show).not.toHaveBeenCalled();
+        expect(this.$input.focus).toHaveBeenCalled();
+      });
+
+      it("should show form at given position when form width is greater than box width", function() {
+        this.$photo.marginWidth = 25;
+        this.$photo.formWidth = this.$photo.width + (this.$photo.marginWidth * 2);
+        this.$photo.showForm(300, 200);
+
+        expect(this.$photo.fx).toBe(300);
+        expect(this.$photo.x).toBe(325);
+        expect(this.$photo.y).toBe(200);
+        expect(this.$form.css).toHaveBeenCalledWith({
+          top: 200,
+          left: 300
+        });
+
+        expect(this.$form.hasClass('jq-phototagging-visible')).toBe(true);
+        expect(this.$box.hasClass('jq-phototagging-left')).toBe(false);
+        expect(this.$box.hasClass('jq-phototagging-right')).toBe(false);
+        expect(this.$form.show).not.toHaveBeenCalled();
+        expect(this.$input.focus).toHaveBeenCalled();
+      });
+
+      it("should show form aligned on the left when form is at the left of image (out of bounds)", function() {
+        this.$photo.showForm(-5, 200);
+
+        expect(this.$photo.fx).toBe(0);
+        expect(this.$photo.x).toBe(0);
+        expect(this.$photo.y).toBe(200);
+        expect(this.$form.css).toHaveBeenCalledWith({
+          top: 200,
+          left: 0
+        });
+
+        expect(this.$form.hasClass('jq-phototagging-visible')).toBe(true);
+        expect(this.$box.hasClass('jq-phototagging-left')).toBe(true);
+        expect(this.$box.hasClass('jq-phototagging-right')).toBe(false);
+        expect(this.$form.show).not.toHaveBeenCalled();
+        expect(this.$input.focus).toHaveBeenCalled();
+      });
+
+      it("should show form aligned on the right when form is at the right of image (out of bounds)", function() {
+        this.$photo.showForm(780, 200);
+
+        expect(this.$photo.fx).toBe(700);
+        expect(this.$photo.x).toBe(700);
+        expect(this.$photo.y).toBe(200);
+        expect(this.$form.css).toHaveBeenCalledWith({
+          top: 200,
+          left: 700
+        });
+
+        expect(this.$form.hasClass('jq-phototagging-visible')).toBe(true);
+        expect(this.$box.hasClass('jq-phototagging-left')).toBe(false);
+        expect(this.$box.hasClass('jq-phototagging-right')).toBe(true);
+        expect(this.$form.show).not.toHaveBeenCalled();
+        expect(this.$input.focus).toHaveBeenCalled();
+      });
+
+      it("should show form aligned at the top when form is at the top of image (out of bounds)", function() {
+        this.$photo.showForm(300, -10);
+
+        expect(this.$photo.fx).toBe(300);
+        expect(this.$photo.x).toBe(300);
+        expect(this.$photo.y).toBe(0);
+        expect(this.$form.css).toHaveBeenCalledWith({
+          top: 0,
+          left: 300
+        });
+
+        expect(this.$form.hasClass('jq-phototagging-visible')).toBe(true);
+        expect(this.$box.hasClass('jq-phototagging-left')).toBe(false);
+        expect(this.$box.hasClass('jq-phototagging-right')).toBe(false);
+        expect(this.$form.show).not.toHaveBeenCalled();
+        expect(this.$input.focus).toHaveBeenCalled();
+      });
+
+      it("should show form aligned at the bottom when form is at the bottom of image (out of bounds)", function() {
+        this.$photo.showForm(300, 480);
+
+        expect(this.$photo.fx).toBe(300);
+        expect(this.$photo.x).toBe(300);
+        expect(this.$photo.y).toBe(400);
+        expect(this.$form.css).toHaveBeenCalledWith({
+          top: 400,
+          left: 300
+        });
+
+        expect(this.$form.hasClass('jq-phototagging-visible')).toBe(true);
+        expect(this.$box.hasClass('jq-phototagging-left')).toBe(false);
+        expect(this.$box.hasClass('jq-phototagging-right')).toBe(false);
         expect(this.$form.show).not.toHaveBeenCalled();
         expect(this.$input.focus).toHaveBeenCalled();
       });
@@ -378,6 +556,13 @@ describe("jQuery PhotoTagging Test Suite", function() {
       });
 
       it("should submit form", function() {
+        this.$photo.x = 10;
+        this.$photo.y = 20;
+        this.$photo.width = 100;
+        this.$photo.height = 200;
+        this.$photo.$imgWidth = 50;
+        this.$photo.$imgHeight = 60;
+
         this.$photo.submitForm('foobar');
         expect($.ajax).toHaveBeenCalledWith({
           url: '/foo',
@@ -425,7 +610,12 @@ describe("jQuery PhotoTagging Test Suite", function() {
           };
         });
 
-        this.$photo.$img.height.andReturn(60);
+        this.$photo.x = 10;
+        this.$photo.y = 20;
+        this.$photo.width = 100;
+        this.$photo.height = 200;
+        this.$photo.$imgWidth = 50;
+        this.$photo.$imgHeight = 60;
 
         this.$photo.submitForm('foobar');
         expect(this.$photo.opts.paramsFn).toHaveBeenCalled();
@@ -589,6 +779,14 @@ describe("jQuery PhotoTagging Test Suite", function() {
         expect($tags.off).toHaveBeenCalledWith('.jqphototagging');
         expect($form.off).toHaveBeenCalledWith('.jqphototagging');
         expect($img.off).toHaveBeenCalledWith('.jqphototagging');
+      });
+
+      it("should unbind user events without form", function() {
+        var $tags = this.$photo.$tags;
+        this.$photo.$form = undefined;
+
+        this.$photo.unbind();
+        expect($tags.off).toHaveBeenCalledWith('.jqphototagging');
       });
 
       it("should destroy plugin", function() {
