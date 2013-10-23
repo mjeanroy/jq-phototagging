@@ -30,9 +30,9 @@
 
 <div class="pic-tags">
   <div class="pic">
-    <img src="sample.jpg"/>
+    <img id="img-1" src="sample.jpg"/>
   </div>
-  <ul class="tags"></ul>
+  <ul id="tags-1" class="tags"></ul>
 </div>
 <div class="license">
   <p>Image from Arno Meintjes.</p>
@@ -42,9 +42,9 @@
 
 <div class="pic-tags">
   <div class="pic">
-    <img src="sample2.jpg"/>
+    <img id="img-2" src="sample2.jpg"/>
   </div>
-  <ul class="tags"></ul>
+  <ul id="tags-2" class="tags"></ul>
 </div>
 <div class="license">
   <p>Image from Thomas Bresson.</p>
@@ -75,10 +75,40 @@
     height: 215
   };
 
-  $('img').jqPhotoTagging({
+  $('#img-1').jqPhotoTagging({
     url: '/tags',
-    $tags: '.tags',
+    $tags: '#tags-1',
     tags: [tag1, tag2],
+    width: 100,
+    height: 100
+  });
+
+  var tag3 = {
+    id: 1,
+    name: 'Third Tag',
+    imgWidth: 800,
+    imgHeight: 534,
+    x: 500,
+    y: 200,
+    width: 250,
+    height: 300
+  };
+
+  var tag4 = {
+    id: 2,
+    name: 'Fourth Tag',
+    imgWidth: 800,
+    imgHeight: 534,
+    x: 150,
+    y: 150,
+    width: 250,
+    height: 215
+  };
+
+  $('#img-2').jqPhotoTagging({
+    url: '/tags',
+    $tags: '#tags-2',
+    tags: [tag3, tag4],
     width: 100,
     height: 100
   });
