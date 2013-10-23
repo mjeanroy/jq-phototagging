@@ -419,6 +419,13 @@
             that.submitForm(val);
           }
         });
+
+        this.$input.on('keyup' + NAMESPACE, function(e) {
+          if (e.keyCode === 27) {
+            // Escape key is pressed, hide form
+            that.hideForm();
+          }
+        });
       }
     },
 

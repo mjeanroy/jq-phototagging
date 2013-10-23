@@ -300,6 +300,19 @@ describe("jQuery PhotoTagging Test Suite", function() {
 
         expect(this.$img.on).toHaveBeenCalledWith('click.jqphototagging', jasmine.any(Function));
         expect(this.$form.on).toHaveBeenCalledWith('submit.jqphototagging', jasmine.any(Function));
+        expect(this.$input.on).toHaveBeenCalledWith('keyup.jqphototagging', jasmine.any(Function));
+      });
+
+      it("should not bind user events on form when tag is readonly", function() {
+        this.$tags.on.reset();
+        this.$img.on.reset();
+        this.$form.on.reset();
+        this.$input.on.reset();
+
+        this.$photo.$form = undefined;
+        this.$photo.bind();
+        expect(this.$tags.on).toHaveBeenCalledWith('mouseenter.jqphototagging', 'li', jasmine.any(Function));
+        expect(this.$tags.on).toHaveBeenCalledWith('mouseleave.jqphototagging', 'li', jasmine.any(Function));
       });
 
       it("should show boxes when user is hover tag name", function() {
@@ -316,6 +329,15 @@ describe("jQuery PhotoTagging Test Suite", function() {
 
         $li.trigger('mouseleave');
         expect($box.hasClass('jq-phototagging-visible')).toBe(false);
+      });
+
+      it("should hide form when user press escape key in input", function() {
+        spyOn(this.$photo, 'hideForm');
+
+        var event = jQuery.Event('keyup');
+        event.keyCode = 27;
+        this.$input.trigger(event);
+        expect(this.$photo.hideForm).toHaveBeenCalled();
       });
     });
 
