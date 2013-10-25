@@ -297,6 +297,49 @@ describe("jQuery PhotoTagging Test Suite", function() {
       expect($photo.val).toHaveBeenCalled();
       expect(value).toBe('foobar');
     });
+
+    it("should submit tag", function() {
+      this.$img.jqPhotoTagging();
+
+      var $photo = this.$img.data('jqPhotoTagging');
+      spyOn($photo, 'submitForm');
+      spyOn($photo, 'val').andReturn('foobar');
+
+      var result = this.$img.jqPhotoTagging().submit();
+      expect($photo.val).toHaveBeenCalled();
+      expect($photo.submitForm).toHaveBeenCalledWith('foobar');
+      expect(result).toBe(this.$img.jqPhotoTagging());
+    });
+
+    it("should set value and submit tag", function() {
+      this.$img.jqPhotoTagging();
+
+      var $photo = this.$img.data('jqPhotoTagging');
+      spyOn($photo, 'submitForm');
+      spyOn($photo, 'val').andReturn('foobar');
+
+      var result = this.$img.jqPhotoTagging().submit('foobar');
+      expect($photo.val).toHaveBeenCalledWith('foobar');
+      expect($photo.submitForm).toHaveBeenCalledWith('foobar');
+      expect(result).toBe(this.$img.jqPhotoTagging());
+    });
+
+    it("should set tag value and submit tag", function() {
+      this.$img.jqPhotoTagging();
+
+      var $photo = this.$img.data('jqPhotoTagging');
+      spyOn($photo, 'submitForm');
+      spyOn($photo, 'val').andReturn('foobar');
+
+      var tag = {
+        name: 'foobar'
+      };
+
+      var result = this.$img.jqPhotoTagging().submit(tag);
+      expect($photo.val).toHaveBeenCalledWith(tag);
+      expect($photo.submitForm).toHaveBeenCalledWith('foobar');
+      expect(result).toBe(this.$img.jqPhotoTagging());
+    });
   });
 
   describe("jQuery Phototagging: behavior", function() {
@@ -479,17 +522,15 @@ describe("jQuery PhotoTagging Test Suite", function() {
       });
 
       it("should not submit form if user does not submit a value", function() {
-        spyOn(this.$photo, 'submitForm');
         this.$input.val('');
         this.$form.trigger('submit');
-        expect(this.$photo.submitForm).not.toHaveBeenCalled();
+        expect($.ajax).not.toHaveBeenCalled();
       });
 
       it("should not submit form if user submit spaces", function() {
-        spyOn(this.$photo, 'submitForm');
         this.$input.val('  ');
         this.$form.trigger('submit');
-        expect(this.$photo.submitForm).not.toHaveBeenCalled();
+        expect($.ajax).not.toHaveBeenCalled();
       });
 
       it("should show form at given position when form width is equal to box width", function() {

@@ -434,10 +434,7 @@
 
         this.$form.on('submit' + NAMESPACE, function(e) {
           e.preventDefault();
-          var val = that.val();
-          if (val) {
-            that.submitForm(val);
-          }
+          that.submitForm(that.val());
         });
 
         this.$input.on('keyup' + NAMESPACE, function(e) {
@@ -552,7 +549,7 @@
      * @param {string} value Value of tag.
      */
     submitForm: function(value) {
-      if (!this.$submitting) {
+      if (value && !this.$submitting) {
         this.$submitting = true;
 
         var params = this.params(value);
@@ -728,6 +725,15 @@
         return this;
       }
       return plugin.val();
+    };
+
+    this.submit = function(value) {
+      var plugin = $(this).data(PLUGIN_NAME);
+      if (isDefined(value)) {
+        plugin.val(value);
+      }
+      plugin.submitForm(plugin.val());
+      return this;
     };
 
     return this.each(function() {
