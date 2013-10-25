@@ -760,6 +760,8 @@
       return $(this).data(PLUGIN_NAME).position();
     };
 
+    var args = arguments;
+    var that = this;
     return this.each(function() {
       var $this = $(this);
       var plugin = $this.data(PLUGIN_NAME);
@@ -771,7 +773,12 @@
         plugin = new PhotoTagging($this, opts);
         plugin.init();
       }
+
       $this.data(PLUGIN_NAME, plugin);
+
+      if (args.length > 0 && typeof args[0] === 'string') {
+        that[args[0]].apply(that, Array.prototype.slice.call(args, 1));
+      }
     });
 
   };

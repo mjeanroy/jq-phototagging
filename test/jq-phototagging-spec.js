@@ -293,6 +293,17 @@ describe("jQuery PhotoTagging Test Suite", function() {
       expect($photo.val).toHaveBeenCalledWith('foobar');
     });
 
+    it("should call val of plugin with a string parameter", function() {
+      this.$img.jqPhotoTagging();
+
+      var $photo = this.$img.data('jqPhotoTagging');
+      spyOn($photo, 'val');
+
+      var result = this.$img.jqPhotoTagging('val', 'foobar');
+      expect(result).toBe(this.$img.jqPhotoTagging());
+      expect($photo.val).toHaveBeenCalledWith('foobar');
+    });
+
     it("should get val of plugin", function() {
       this.$img.jqPhotoTagging();
 
@@ -317,6 +328,19 @@ describe("jQuery PhotoTagging Test Suite", function() {
       expect(result).toBe(this.$img.jqPhotoTagging());
     });
 
+    it("should submit tag with a string parameter", function() {
+      this.$img.jqPhotoTagging();
+
+      var $photo = this.$img.data('jqPhotoTagging');
+      spyOn($photo, 'submitForm');
+      spyOn($photo, 'val').andReturn('foobar');
+
+      var result = this.$img.jqPhotoTagging('submit');
+      expect($photo.val).toHaveBeenCalled();
+      expect($photo.submitForm).toHaveBeenCalledWith('foobar');
+      expect(result).toBe(this.$img.jqPhotoTagging());
+    });
+
     it("should set value and submit tag", function() {
       this.$img.jqPhotoTagging();
 
@@ -325,6 +349,19 @@ describe("jQuery PhotoTagging Test Suite", function() {
       spyOn($photo, 'val').andReturn('foobar');
 
       var result = this.$img.jqPhotoTagging().submit('foobar');
+      expect($photo.val).toHaveBeenCalledWith('foobar');
+      expect($photo.submitForm).toHaveBeenCalledWith('foobar');
+      expect(result).toBe(this.$img.jqPhotoTagging());
+    });
+
+    it("should set value and submit tag with a string parameter", function() {
+      this.$img.jqPhotoTagging();
+
+      var $photo = this.$img.data('jqPhotoTagging');
+      spyOn($photo, 'submitForm');
+      spyOn($photo, 'val').andReturn('foobar');
+
+      var result = this.$img.jqPhotoTagging('submit', 'foobar');
       expect($photo.val).toHaveBeenCalledWith('foobar');
       expect($photo.submitForm).toHaveBeenCalledWith('foobar');
       expect(result).toBe(this.$img.jqPhotoTagging());
@@ -342,6 +379,23 @@ describe("jQuery PhotoTagging Test Suite", function() {
       };
 
       var result = this.$img.jqPhotoTagging().submit(tag);
+      expect($photo.val).toHaveBeenCalledWith(tag);
+      expect($photo.submitForm).toHaveBeenCalledWith('foobar');
+      expect(result).toBe(this.$img.jqPhotoTagging());
+    });
+
+    it("should set tag value and submit tag with a string parameter", function() {
+      this.$img.jqPhotoTagging();
+
+      var $photo = this.$img.data('jqPhotoTagging');
+      spyOn($photo, 'submitForm');
+      spyOn($photo, 'val').andReturn('foobar');
+
+      var tag = {
+        name: 'foobar'
+      };
+
+      var result = this.$img.jqPhotoTagging('submit', tag);
       expect($photo.val).toHaveBeenCalledWith(tag);
       expect($photo.submitForm).toHaveBeenCalledWith('foobar');
       expect(result).toBe(this.$img.jqPhotoTagging());
