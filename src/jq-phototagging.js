@@ -752,6 +752,14 @@
       return this;
     };
 
+    /**
+     * Get position of tag form.
+     * @returns {object} Position of form.
+     */
+    this.position = function() {
+      return $(this).data(PLUGIN_NAME).position();
+    };
+
     return this.each(function() {
       var $this = $(this);
       var plugin = $this.data(PLUGIN_NAME);

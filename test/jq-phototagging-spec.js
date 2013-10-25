@@ -346,6 +346,23 @@ describe("jQuery PhotoTagging Test Suite", function() {
       expect($photo.submitForm).toHaveBeenCalledWith('foobar');
       expect(result).toBe(this.$img.jqPhotoTagging());
     });
+
+    it("should get current position", function() {
+      this.$img.jqPhotoTagging();
+
+      var $photo = this.$img.data('jqPhotoTagging');
+
+      var position = {
+        x: 0,
+        y: 0
+      };
+
+      spyOn($photo, 'position').andReturn(position);
+
+      var result = this.$img.jqPhotoTagging().position();
+      expect($photo.position).toHaveBeenCalledWith();
+      expect(result).toBe(position);
+    });
   });
 
   describe("jQuery Phototagging: behavior", function() {
