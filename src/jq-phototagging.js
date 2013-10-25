@@ -146,6 +146,14 @@
     return obj;
   };
 
+  /**
+   * Check if an object is defined (i.e. is not null or undefined).
+   * @returns {boolean} true if object is defined, false otherwise.
+   */
+  var isDefined = function(obj) {
+    return obj !== undefined && obj !== null;
+  };
+
   /** Generate a unique id */
   var uniqId = function($ids) {
     var exist = true;
@@ -426,7 +434,7 @@
 
         this.$form.on('submit' + NAMESPACE, function(e) {
           e.preventDefault();
-          var val = $.trim(that.$input.val());
+          var val = that.val();
           if (val) {
             that.submitForm(val);
           }
@@ -450,6 +458,24 @@
       this.$img.off('click' + NAMESPACE);
       this.$form.unbind(NAMESPACE);
       this.$iconRemove.off(NAMESPACE);
+    },
+
+    /**
+     * Get current value of input or change value in input.
+     * @param {string?} value Value to set in input.
+     * @return {string|Phototagging} Current value or this.
+     */
+    val: function(value) {
+      if (isDefined(value)) {
+        var str = typeof value === 'string' ?
+          value :
+          this.renderTag(value);
+
+        this.$input.val($.trim(str));
+        return this;
+      }
+
+      return $.trim(this.$input.val());
     },
 
     /** Display form used to type a new tag. */
@@ -688,6 +714,20 @@
       var $this = $(this);
       $this.data(PLUGIN_NAME).destroy();
       $this.removeData(PLUGIN_NAME);
+    };
+
+    /**
+     * Get/Set value in input.
+     * @param {string?} value Value to set (if defined).
+     * @returns this object if parameter is set, input's value otherwise.
+     */
+    this.val = function(value) {
+      var plugin = $(this).data(PLUGIN_NAME);
+      if (isDefined(value)) {
+        plugin.val(value);
+        return this;
+      }
+      return plugin.val();
     };
 
     return this.each(function() {

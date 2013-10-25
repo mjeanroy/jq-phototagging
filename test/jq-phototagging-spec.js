@@ -275,6 +275,28 @@ describe("jQuery PhotoTagging Test Suite", function() {
       expect($photo.$imgWidth).toBeDefined();
       expect($photo.$imgHeight).toBeDefined();
     });
+
+    it("should call val of plugin", function() {
+      this.$img.jqPhotoTagging();
+
+      var $photo = this.$img.data('jqPhotoTagging');
+      spyOn($photo, 'val');
+
+      var result = this.$img.jqPhotoTagging().val('foobar');
+      expect(result).toBe(this.$img.jqPhotoTagging());
+      expect($photo.val).toHaveBeenCalledWith('foobar');
+    });
+
+    it("should get val of plugin", function() {
+      this.$img.jqPhotoTagging();
+
+      var $photo = this.$img.data('jqPhotoTagging');
+      spyOn($photo, 'val').andReturn('foobar');
+
+      var value = this.$img.jqPhotoTagging().val();
+      expect($photo.val).toHaveBeenCalled();
+      expect(value).toBe('foobar');
+    });
   });
 
   describe("jQuery Phototagging: behavior", function() {
@@ -693,6 +715,43 @@ describe("jQuery PhotoTagging Test Suite", function() {
           imgWidth: 50,
           imgHeight: 60
         });
+      });
+
+      it("should set value", function() {
+        this.$photo.val('foobar');
+
+        expect(this.$photo.$input.val).toHaveBeenCalledWith('foobar');
+        expect(this.$photo.$input.val()).toBe('foobar');
+      });
+
+      it("should set trimmed value", function() {
+        this.$photo.val(' foobar ');
+
+        expect(this.$photo.$input.val).toHaveBeenCalledWith('foobar');
+        expect(this.$photo.$input.val()).toBe('foobar');
+      });
+
+      it("should set value from tag object", function() {
+        var tag = {
+          name: 'foobar'
+        };
+
+        this.$photo.val(tag);
+
+        expect(this.$photo.$input.val).toHaveBeenCalledWith('foobar');
+        expect(this.$photo.$input.val()).toBe('foobar');
+      });
+
+      it("should get value", function() {
+        this.$photo.$input.val('foobar');
+        var value = this.$photo.val();
+        expect(value).toBe('foobar');
+      });
+
+      it("should get trimmed value", function() {
+        this.$photo.$input.val(' foobar ');
+        var value = this.$photo.val();
+        expect(value).toBe('foobar');
       });
     });
 
