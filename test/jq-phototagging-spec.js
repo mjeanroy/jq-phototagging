@@ -57,6 +57,7 @@ describe("jQuery PhotoTagging Test Suite", function() {
         resultFn: jasmine.any(Function),
         paramsFn: jasmine.any(Function),
         onLoaded: jasmine.any(Function),
+        onShown: jasmine.any(Function),
         onInitialized: jasmine.any(Function),
         onSavedSuccess: jasmine.any(Function),
         onSavedFailed: jasmine.any(Function)
@@ -94,6 +95,7 @@ describe("jQuery PhotoTagging Test Suite", function() {
         resultFn: jasmine.any(Function),
         paramsFn: jasmine.any(Function),
         onLoaded: jasmine.any(Function),
+        onShown: jasmine.any(Function),
         onInitialized: jasmine.any(Function),
         onSavedSuccess: jasmine.any(Function),
         onSavedFailed: jasmine.any(Function)
@@ -117,6 +119,7 @@ describe("jQuery PhotoTagging Test Suite", function() {
         resultFn: jasmine.any(Function),
         paramsFn: jasmine.any(Function),
         onLoaded: jasmine.any(Function),
+        onShown: jasmine.any(Function),
         onInitialized: jasmine.any(Function),
         onSavedSuccess: jasmine.any(Function),
         onSavedFailed: jasmine.any(Function)
@@ -481,11 +484,11 @@ describe("jQuery PhotoTagging Test Suite", function() {
           imgWidth: 50,
           imgHeight: 60
         };
+
+        spyOn(this.$photo.opts, 'onShown');
       });
 
       it("should show form if user click on image", function() {
-        spyOn(this.$photo, 'showForm');
-
         this.$photo.formWidth = 50;
         this.$photo.formHeight = 100;
 
@@ -500,6 +503,8 @@ describe("jQuery PhotoTagging Test Suite", function() {
         var event = jQuery.Event('click');
         event.clientX = 200;
         event.clientY = 150;
+
+        spyOn(this.$photo, 'showForm');
 
         this.$img.trigger(event);
 
@@ -536,6 +541,7 @@ describe("jQuery PhotoTagging Test Suite", function() {
       it("should show form at given position when form width is equal to box width", function() {
         var x = 400;
         var y = 200;
+
         this.$photo.showForm(x, y);
 
         expect(this.$photo.fx).toBe(400);
@@ -550,11 +556,21 @@ describe("jQuery PhotoTagging Test Suite", function() {
         expect(this.$box.hasClass('jq-phototagging-right')).toBe(false);
         expect(this.$form.show).toHaveBeenCalled();
         expect(this.$input.focus).toHaveBeenCalled();
+
+        expect(this.$photo.opts.onShown).toHaveBeenCalledWith({
+          x : 400,
+          y : 200,
+          width : 100,
+          height : 100,
+          imgWidth : 800,
+          imgHeight : 500
+        });
       });
 
       it("should show form at given position when form width is greater than box width", function() {
         this.$photo.marginWidth = 25;
         this.$photo.formWidth = this.$photo.width + (this.$photo.marginWidth * 2);
+
         this.$photo.showForm(300, 200);
 
         expect(this.$photo.fx).toBe(300);
@@ -569,6 +585,15 @@ describe("jQuery PhotoTagging Test Suite", function() {
         expect(this.$box.hasClass('jq-phototagging-right')).toBe(false);
         expect(this.$form.show).toHaveBeenCalled();
         expect(this.$input.focus).toHaveBeenCalled();
+
+        expect(this.$photo.opts.onShown).toHaveBeenCalledWith({
+          x : 325,
+          y : 200,
+          width : 100,
+          height : 100,
+          imgWidth : 800,
+          imgHeight : 500
+        });
       });
 
       it("should show form aligned on the left when form is at the left of image (out of bounds)", function() {
@@ -586,6 +611,15 @@ describe("jQuery PhotoTagging Test Suite", function() {
         expect(this.$box.hasClass('jq-phototagging-right')).toBe(false);
         expect(this.$form.show).toHaveBeenCalled();
         expect(this.$input.focus).toHaveBeenCalled();
+
+        expect(this.$photo.opts.onShown).toHaveBeenCalledWith({
+          x : 0,
+          y : 200,
+          width : 100,
+          height : 100,
+          imgWidth : 800,
+          imgHeight : 500
+        });
       });
 
       it("should show form aligned on the right when form is at the right of image (out of bounds)", function() {
@@ -603,6 +637,15 @@ describe("jQuery PhotoTagging Test Suite", function() {
         expect(this.$box.hasClass('jq-phototagging-right')).toBe(true);
         expect(this.$form.show).toHaveBeenCalled();
         expect(this.$input.focus).toHaveBeenCalled();
+
+        expect(this.$photo.opts.onShown).toHaveBeenCalledWith({
+          x : 700,
+          y : 200,
+          width : 100,
+          height : 100,
+          imgWidth : 800,
+          imgHeight : 500
+        });
       });
 
       it("should show form aligned at the top when form is at the top of image (out of bounds)", function() {
@@ -620,6 +663,15 @@ describe("jQuery PhotoTagging Test Suite", function() {
         expect(this.$box.hasClass('jq-phototagging-right')).toBe(false);
         expect(this.$form.show).toHaveBeenCalled();
         expect(this.$input.focus).toHaveBeenCalled();
+
+        expect(this.$photo.opts.onShown).toHaveBeenCalledWith({
+          x : 300,
+          y : 0,
+          width : 100,
+          height : 100,
+          imgWidth : 800,
+          imgHeight : 500
+        });
       });
 
       it("should show form aligned at the bottom when form is at the bottom of image (out of bounds)", function() {
@@ -637,6 +689,15 @@ describe("jQuery PhotoTagging Test Suite", function() {
         expect(this.$box.hasClass('jq-phototagging-right')).toBe(false);
         expect(this.$form.show).toHaveBeenCalled();
         expect(this.$input.focus).toHaveBeenCalled();
+
+        expect(this.$photo.opts.onShown).toHaveBeenCalledWith({
+          x : 300,
+          y : 400,
+          width : 100,
+          height : 100,
+          imgWidth : 800,
+          imgHeight : 500
+        });
       });
 
       it("should hide form", function() {

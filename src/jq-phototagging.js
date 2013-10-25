@@ -530,6 +530,8 @@
       this.x = x;
       this.y = y;
 
+      this.opts.onShown(this.position());
+
       this.$form.css({
         left: fx,
         top: fy
@@ -591,8 +593,19 @@
      * @returns {object} Parameter object.
      */
     params: function(value) {
-      var defaultParams = {
-        value: value,
+      var defaultParams = this.position();
+      defaultParams.value = value;
+
+      var custom = this.opts.paramsFn.call(this, defaultParams);
+      return $.extend(defaultParams, custom);
+    },
+
+    /**
+     * Get position of current tag form.
+     * @returns {object} Tag form position.
+     */
+    position: function() {
+      return {
         x: this.x,
         y: this.y,
         width: this.width,
@@ -600,8 +613,6 @@
         imgWidth: this.$imgWidth,
         imgHeight: this.$imgHeight
       };
-      var custom = this.opts.paramsFn.call(this, defaultParams);
-      return $.extend(defaultParams, custom);
     },
 
     /**
@@ -769,6 +780,7 @@
     resultFn: identity,
     onInitialized: noop,
     onLoaded: noop,
+    onShown: noop,
     onSavedSuccess: noop,
     onSavedFailed: noop
   };
