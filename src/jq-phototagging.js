@@ -738,6 +738,11 @@
       return plugin.val();
     };
 
+    /**
+     * Submit form with given value (optionnal).
+     * @param {string|object?} value Value to submit (optionnal, default will be current value).
+     * @returns this object.
+     */
     this.submit = function(value) {
       var plugin = $(this).data(PLUGIN_NAME);
       if (isDefined(value)) {
