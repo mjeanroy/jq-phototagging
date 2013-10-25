@@ -530,8 +530,6 @@
       this.x = x;
       this.y = y;
 
-      this.opts.onShown(this.position());
-
       this.$form.css({
         left: fx,
         top: fy
@@ -539,11 +537,13 @@
 
       this.$form.show();
       this.$input.focus();
+      this.opts.onShown.call(this, this.position());
     },
 
     /** Hide form used to type a new tag. */
     hideForm: function() {
       this.$form.fadeOut('fast');
+      this.opts.onHidden.call(this);
     },
 
     /**
@@ -781,6 +781,7 @@
     onInitialized: noop,
     onLoaded: noop,
     onShown: noop,
+    onHidden: noop,
     onSavedSuccess: noop,
     onSavedFailed: noop
   };

@@ -58,6 +58,7 @@ describe("jQuery PhotoTagging Test Suite", function() {
         paramsFn: jasmine.any(Function),
         onLoaded: jasmine.any(Function),
         onShown: jasmine.any(Function),
+        onHidden: jasmine.any(Function),
         onInitialized: jasmine.any(Function),
         onSavedSuccess: jasmine.any(Function),
         onSavedFailed: jasmine.any(Function)
@@ -96,6 +97,7 @@ describe("jQuery PhotoTagging Test Suite", function() {
         paramsFn: jasmine.any(Function),
         onLoaded: jasmine.any(Function),
         onShown: jasmine.any(Function),
+        onHidden: jasmine.any(Function),
         onInitialized: jasmine.any(Function),
         onSavedSuccess: jasmine.any(Function),
         onSavedFailed: jasmine.any(Function)
@@ -120,6 +122,7 @@ describe("jQuery PhotoTagging Test Suite", function() {
         paramsFn: jasmine.any(Function),
         onLoaded: jasmine.any(Function),
         onShown: jasmine.any(Function),
+        onHidden: jasmine.any(Function),
         onInitialized: jasmine.any(Function),
         onSavedSuccess: jasmine.any(Function),
         onSavedFailed: jasmine.any(Function)
@@ -486,6 +489,7 @@ describe("jQuery PhotoTagging Test Suite", function() {
         };
 
         spyOn(this.$photo.opts, 'onShown');
+        spyOn(this.$photo.opts, 'onHidden');
       });
 
       it("should show form if user click on image", function() {
@@ -704,6 +708,7 @@ describe("jQuery PhotoTagging Test Suite", function() {
         this.$form.addClass('jq-phototagging-visible');
         this.$photo.hideForm();
         expect(this.$form.fadeOut).toHaveBeenCalled();
+        expect(this.$photo.opts.onHidden).toHaveBeenCalled();
       });
 
       it("should not submit if form is submitting", function() {
