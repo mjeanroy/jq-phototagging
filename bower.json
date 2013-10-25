@@ -23,6 +23,7 @@
     "jquery": "1.8.x"
   },
   "devDependencies": {
-    "bootstrap.css": "~2.3.2"
+    "bootstrap.css": "~2.3.2",
+	"jq-autocomplete": "git@github.com:mjeanroy/jq-autocomplete.git#6b1e4bafd692ca5857618459e48b0cb5e292c60d"
   }
 }
