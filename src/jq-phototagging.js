@@ -548,7 +548,14 @@
     /** Hide form used to type a new tag. */
     hideForm: function() {
       this.$form.fadeOut('fast');
+      this.clear();
       this.opts.onHidden.call(this);
+    },
+
+    /** Clear input used to tag picture */
+    clear: function() {
+      this.$input.val('');
+      this.opts.onClear.call(this);
     },
 
     /**
@@ -580,7 +587,6 @@
           that.opts.onSavedSuccess.apply(that, arguments);
 
           // Hide form
-          that.$input.val('');
           that.hideForm();
 
           // Append tag
@@ -814,6 +820,7 @@
     isValid: returnTrue,
     onShown: noop,
     onHidden: noop,
+    onClear: noop,
     onSavedSuccess: noop,
     onSavedFailed: noop
   };

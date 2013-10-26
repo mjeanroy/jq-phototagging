@@ -59,6 +59,7 @@ describe("jQuery PhotoTagging Test Suite", function() {
         onLoaded: jasmine.any(Function),
         onShown: jasmine.any(Function),
         onHidden: jasmine.any(Function),
+        onClear: jasmine.any(Function),
         isValid: jasmine.any(Function),
         onInitialized: jasmine.any(Function),
         onSavedSuccess: jasmine.any(Function),
@@ -99,6 +100,7 @@ describe("jQuery PhotoTagging Test Suite", function() {
         onLoaded: jasmine.any(Function),
         onShown: jasmine.any(Function),
         onHidden: jasmine.any(Function),
+        onClear: jasmine.any(Function),
         isValid: jasmine.any(Function),
         onInitialized: jasmine.any(Function),
         onSavedSuccess: jasmine.any(Function),
@@ -125,6 +127,7 @@ describe("jQuery PhotoTagging Test Suite", function() {
         onLoaded: jasmine.any(Function),
         onShown: jasmine.any(Function),
         onHidden: jasmine.any(Function),
+        onClear: jasmine.any(Function),
         isValid: jasmine.any(Function),
         onInitialized: jasmine.any(Function),
         onSavedSuccess: jasmine.any(Function),
@@ -564,6 +567,7 @@ describe("jQuery PhotoTagging Test Suite", function() {
 
         spyOn(this.$photo.opts, 'onShown');
         spyOn(this.$photo.opts, 'onHidden');
+        spyOn(this.$photo.opts, 'onClear').andCallThrough();
         spyOn(this.$photo.opts, 'isValid').andCallThrough();
       });
 
@@ -784,6 +788,9 @@ describe("jQuery PhotoTagging Test Suite", function() {
         this.$photo.hideForm();
         expect(this.$form.fadeOut).toHaveBeenCalled();
         expect(this.$photo.opts.onHidden).toHaveBeenCalled();
+
+        expect(this.$input.val).toHaveBeenCalledWith('');
+        expect(this.$photo.opts.onClear).toHaveBeenCalled();
       });
 
       it("should not submit if form is submitting", function() {
