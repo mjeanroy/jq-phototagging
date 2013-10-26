@@ -439,7 +439,7 @@
 
         this.$form.on('submit' + NAMESPACE, function(e) {
           e.preventDefault();
-          that.submitForm(that.val());
+          that.submit(that.val());
         });
 
         this.$input.on('keyup' + NAMESPACE, function(e) {
@@ -464,7 +464,7 @@
 
     /**
      * Get current value of input or change value in input.
-     * @param {string?} value Value to set in input.
+     * @param {string|object?} value Value to set in input.
      * @return {string|Phototagging} Current value or this.
      */
     val: function(value) {
@@ -474,9 +474,7 @@
           this.renderTag(value);
 
         this.$input.val($.trim(str));
-        return this;
       }
-
       return $.trim(this.$input.val());
     },
 
@@ -554,7 +552,7 @@
 
     /** Clear input used to tag picture */
     clear: function() {
-      this.$input.val('');
+      this.val('');
       this.opts.onClear.call(this);
     },
 
@@ -562,8 +560,10 @@
      * Save a new tag.
      * @param {string} value Value of tag.
      */
-    submitForm: function(value) {
+    submit: function(value) {
       if (value && !this.$submitting) {
+        value = this.val(value);
+
         this.$submitting = true;
 
         var params = this.params(value);
@@ -765,7 +765,7 @@
       if (isDefined(value)) {
         plugin.val(value);
       }
-      plugin.submitForm(plugin.val());
+      plugin.submit(plugin.val());
       return this;
     };
 
