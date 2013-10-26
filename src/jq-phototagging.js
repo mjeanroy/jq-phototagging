@@ -256,6 +256,20 @@
   };
 
   /**
+   * Get data attribute value of dom element.
+   * @param {jQuery} $obj jQuery element.
+   * @param {string} data Data attribute name (without 'data-')
+   * @returns {string} Data attribute value or undefined if data attribute is not set.
+   */
+  var data = function($obj, data) {
+    var value = $obj.attr('data-' + data);
+    if (value === '') {
+      value = undefined;
+    }
+    return value;
+  };
+
+  /**
    * Plugin.
    * @param img Image.
    * @param options Initialization options.
@@ -263,7 +277,9 @@
    */
   var PhotoTagging = function(img, options) {
     this.$img = $(img);
-    this.opts = options;
+
+    // Override options with data attributes
+    this.opts = $.extend({}, options, this.readDatas());
 
     // Position of form used to tag images
     this.fx = 0;
@@ -333,6 +349,36 @@
         this.onLoaded,
         this
       );
+    },
+
+    /**
+     * Read data attributes used to initialize plugin.
+     * @return {object} Initialization object initialized with data attributes.
+     */
+    readDatas: function() {
+      var datas = {};
+      var $img = this.$img;
+
+      datas.width = data($img, 'width');
+      datas.height = data($img, 'height');
+      datas.url = data($img, 'url');
+      datas.method = data($img, 'method');
+      datas.dataType = data($img, 'data-type');
+      datas.readOnly = data($img, 'read-only');
+      datas.label = data($img, 'label');
+      datas.$tags = data($img, 'tags');
+
+      if (isDefined(datas.width)) {
+        datas.width = parseFloat(datas.width);
+      }
+      if (isDefined(datas.height)) {
+        datas.height = parseFloat(datas.height);
+      }
+      if (isDefined(datas.readOnly)) {
+        datas.readOnly = datas.readOnly === 'true';
+      }
+
+      return datas;
     },
 
     /** Append form used to tag image */

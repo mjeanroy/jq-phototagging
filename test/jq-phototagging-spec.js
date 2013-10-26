@@ -1,7 +1,7 @@
 describe("jQuery PhotoTagging Test Suite", function() {
 
   beforeEach(function() {
-    this.$fixtures = $('<div><img src="#" /></div>');
+    this.$fixtures = $('<div id="fixtures"><img src="#" /></div>');
     this.$img = this.$fixtures.find('img');
 
     this.tag = {
@@ -35,6 +35,10 @@ describe("jQuery PhotoTagging Test Suite", function() {
     spyOn($.fn, 'offset').andCallThrough();
     spyOn($.fn, 'scrollTop').andCallThrough();
     spyOn($.fn, 'scrollLeft').andCallThrough();
+  });
+
+  afterEach(function() {
+    this.$fixtures.remove();
   });
 
   describe("jQuery Phototagging: initialization", function() {
@@ -121,6 +125,55 @@ describe("jQuery PhotoTagging Test Suite", function() {
         tags: [],
         $tags: null,
         label: jasmine.any(Function),
+        tagSize: jasmine.any(Function),
+        imgSize: jasmine.any(Function),
+        ratio: jasmine.any(Function),
+        resultFn: jasmine.any(Function),
+        paramsFn: jasmine.any(Function),
+        onLoaded: jasmine.any(Function),
+        onShown: jasmine.any(Function),
+        onHidden: jasmine.any(Function),
+        onClear: jasmine.any(Function),
+        isValid: jasmine.any(Function),
+        onInitialized: jasmine.any(Function),
+        onSavedSuccess: jasmine.any(Function),
+        onSavedFailed: jasmine.any(Function),
+        onDestroyed: jasmine.any(Function)
+      });
+    });
+
+    it("should initialize with data attributes", function() {
+      $('body').append(this.$fixtures);
+
+      expect(this.$img.data('jqPhotoTagging')).toBeFalsy();
+
+      this.$fixtures.append('<ul></ul>')
+        .attr('id', 'tags');
+
+      this.$img.attr('data-width', '50');
+      this.$img.attr('data-height', '40');
+      this.$img.attr('data-url', '/foo');
+      this.$img.attr('data-method', 'JSONP');
+      this.$img.attr('data-data-type', 'xml');
+      this.$img.attr('data-read-only', 'true');
+      this.$img.attr('data-label', 'name');
+      this.$img.attr('data-tags', '#tags');
+
+      this.$img.jqPhotoTagging();
+      expect(this.$img.data('jqPhotoTagging')).toBeDefined();
+
+      var plugin = this.$img.data('jqPhotoTagging');
+      expect(plugin.opts).not.toBe($.fn.jqPhotoTagging.options);
+      expect(plugin.opts).toEqual({
+        width: 50,
+        height: 40,
+        readOnly: true,
+        url: '/foo',
+        method: 'JSONP',
+        dataType: 'xml',
+        tags: [],
+        $tags: '#tags',
+        label: 'name',
         tagSize: jasmine.any(Function),
         imgSize: jasmine.any(Function),
         ratio: jasmine.any(Function),
