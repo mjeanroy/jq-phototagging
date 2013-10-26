@@ -24,6 +24,6 @@
   },
   "devDependencies": {
     "bootstrap.css": "~2.3.2",
-	"jq-autocomplete": "git@github.com:mjeanroy/jq-autocomplete.git#5cc79638f0b3f597f7f9bad9c7e90da165c61ddf"
+	"jq-autocomplete": "git@github.com:mjeanroy/jq-autocomplete.git#1c866f4ed602833660da829c77f2f730f9b90f29"
   }
 }
