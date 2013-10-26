@@ -141,6 +141,11 @@
   var noop = function() {
   };
 
+  /** Function that return true. */
+  var returnTrue = function() {
+    return true;
+  };
+
   /** Function that return parameter */
   var identity = function(obj) {
     return obj;
@@ -556,6 +561,12 @@
 
         var params = this.params(value);
 
+        // Check validity
+        if (!this.opts.isValid.call(this, value, params)) {
+          this.$submitting = false;
+          return;
+        }
+
         var xhr = $.ajax({
           url: this.opts.url,
           type: this.opts.method,
@@ -800,6 +811,7 @@
     resultFn: identity,
     onInitialized: noop,
     onLoaded: noop,
+    isValid: returnTrue,
     onShown: noop,
     onHidden: noop,
     onSavedSuccess: noop,

@@ -82,7 +82,12 @@
     height: 215
   };
 
+  var $tagging1;
+  var $tagging2;
+
   var $createForm = $('.create-form').eq(0);
+
+  var currentSpecies = null;
 
   var autocomplete = function($wrapper, $input) {
     $input.jqAutoComplete({
@@ -90,13 +95,23 @@
       relativeTo: $wrapper,
       label: 'name',
       $createForm: $createForm,
+      select: function(species) {
+        currentSpecies = species;
+      },
+      unSelect: function() {
+        currentSpecies = null;
+      },
       onSavedSuccess: function(species) {
-        console.log('on saved success');
+        currentSpecies = species;
+        $tagging1.submit({
+          name: species.name,
+          species: species
+        });
       }
     });
   };
 
-  $('#img-1').jqPhotoTagging({
+  $tagging1 = $('#img-1').jqPhotoTagging({
     url: '/tags',
     $tags: '#tags-1',
     tags: [tag1, tag2],
@@ -105,6 +120,12 @@
     onInitialized: function($wrapper, $form) {
       var $input = $form.find('input');
       autocomplete($wrapper, $input);
+    },
+    isValid: function() {
+      return !!currentSpecies;
+    },
+    onSavedSuccess: function() {
+      currentSpecies = null;
     }
   });
 
@@ -130,7 +151,7 @@
     height: 215
   };
 
-  $('#img-2').jqPhotoTagging({
+  $tagging2 = $('#img-2').jqPhotoTagging({
     url: '/tags',
     $tags: '#tags-2',
     tags: [tag3, tag4],
