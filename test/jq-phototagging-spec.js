@@ -63,7 +63,8 @@ describe("jQuery PhotoTagging Test Suite", function() {
         isValid: jasmine.any(Function),
         onInitialized: jasmine.any(Function),
         onSavedSuccess: jasmine.any(Function),
-        onSavedFailed: jasmine.any(Function)
+        onSavedFailed: jasmine.any(Function),
+        onDestroyed: jasmine.any(Function)
       });
     });
 
@@ -104,7 +105,8 @@ describe("jQuery PhotoTagging Test Suite", function() {
         isValid: jasmine.any(Function),
         onInitialized: jasmine.any(Function),
         onSavedSuccess: jasmine.any(Function),
-        onSavedFailed: jasmine.any(Function)
+        onSavedFailed: jasmine.any(Function),
+        onDestroyed: jasmine.any(Function)
       });
 
       var defaults = jQuery.fn.jqPhotoTagging.options;
@@ -131,7 +133,8 @@ describe("jQuery PhotoTagging Test Suite", function() {
         isValid: jasmine.any(Function),
         onInitialized: jasmine.any(Function),
         onSavedSuccess: jasmine.any(Function),
-        onSavedFailed: jasmine.any(Function)
+        onSavedFailed: jasmine.any(Function),
+        onDestroyed: jasmine.any(Function)
       });
     });
 
@@ -1103,7 +1106,11 @@ describe("jQuery PhotoTagging Test Suite", function() {
         var $tags = this.$photo.$tags;
         var $wrapper = this.$photo.$wrapper;
 
+        spyOn(this.$photo.opts, 'onDestroyed');
+        var onDestroyed = this.$photo.opts.onDestroyed;
+
         this.$photo.destroy();
+        expect(onDestroyed).toHaveBeenCalled();
         expect($wrapper.unwrap).toHaveBeenCalled();
         expect($tags.remove).toHaveBeenCalled();
         expect($tags.off).toHaveBeenCalledWith('.jqphototagging');

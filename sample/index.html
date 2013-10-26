@@ -128,6 +128,9 @@
     },
     onHidden: function() {
       this.$autocomplete.clear();
+    },
+    onDestroyed: function() {
+      this.$autocomplete.destroy();
     }
   });
 

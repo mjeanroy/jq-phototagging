@@ -715,6 +715,8 @@
 
     /** Destroy phototagging object */
     destroy: function() {
+      this.opts.onDestroyed.call(this);
+
       this.unbind();
       this.$tags.remove();
       this.$wrapper.unwrap();
@@ -817,6 +819,7 @@
     resultFn: identity,
     onInitialized: noop,
     onLoaded: noop,
+    onDestroyed: noop,
     isValid: returnTrue,
     onShown: noop,
     onHidden: noop,
