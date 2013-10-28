@@ -324,17 +324,16 @@
 
       // Generate list of tags
       var $tags = this.opts.$tags;
-      if (!$tags) {
-        $tags = $('<ul></ul>');
-        $wrapper.append($tags);
-      }
+      if ($tags) {
+        $tags = $($tags);
+        if ($tags.length > 0) {
+          if ($tags.get(0).tagName !== 'UL') {
+            $tags = $('<ul></ul>').appendTo($tags);
+          }
 
-      $tags = $($tags);
-      if ($tags.get(0).tagName !== 'UL') {
-        $tags = $('<ul></ul>').appendTo($tags);
+          $tags.addClass(CSS_TAGS);
+        }
       }
-
-      $tags.addClass(CSS_TAGS);
 
       // Generate boxes wrapper to show squares in images
       var $boxes = $('<div></div>')
@@ -342,7 +341,7 @@
         .appendTo($wrapper);
 
       this.$wrapper = $wrapper;
-      this.$tags = $tags;
+      this.$tags = $tags || $('<ul></ul>');
       this.$boxes = $boxes;
 
       this.appendForm();

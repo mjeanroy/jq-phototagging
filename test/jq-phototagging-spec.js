@@ -195,9 +195,11 @@ describe("jQuery PhotoTagging Test Suite", function() {
       var onInitialized = jasmine.createSpy('onInitialized');
       var onLoaded = jasmine.createSpy('onLoaded');
 
+      var $ul = $('<ul></ul>');
       this.$img.jqPhotoTagging({
         width: 50,
         height: 50,
+        $tags: $ul,
         tags: [this.tag],
         onInitialized: onInitialized,
         onLoaded: onLoaded
@@ -217,13 +219,7 @@ describe("jQuery PhotoTagging Test Suite", function() {
       expect($wrapper.get(0)).not.toEqual(this.$fixtures.get(0));
       expect($wrapper.get(0)).toEqual($photo.$wrapper.get(0));
 
-      var $tags = this.$img.next();
-      expect($tags).toBeDefined();
-      expect($tags.length).toBe(1);
-      expect($tags.get(0)).toEqual(this.$fixtures.find('ul').get(0));
-      expect($tags.get(0)).toEqual($photo.$tags.get(0));
-
-      var $boxes = $tags.next();
+      var $boxes = this.$img.next();
       expect($boxes).toBeDefined();
 
       var $form = $boxes.next();
@@ -247,14 +243,40 @@ describe("jQuery PhotoTagging Test Suite", function() {
       expect(onLoaded).toHaveBeenCalledWith($photo.tags, $photo.$tags);
     });
 
-    it("should generate html (readonly)", function() {
+    it("should generate html without tag list", function() {
       var onInitialized = jasmine.createSpy('onInitialized');
       var onLoaded = jasmine.createSpy('onLoaded');
 
       this.$img.jqPhotoTagging({
         width: 50,
         height: 50,
+        tags: [this.tag],
+        onInitialized: onInitialized,
+        onLoaded: onLoaded
+      });
+
+      // trigger images loaded event
+      this.$img.trigger('load');
+
+      var $photo = this.$img.data('jqPhotoTagging');
+      expect($photo.$img).toBeDefined();
+      expect($photo.$img.get(0)).toEqual(this.$img.get(0));
+
+      var $tags = this.$img.next();
+      expect($tags).toBeDefined();
+      expect($tags.get(0).tagName).not.toBe('UL');
+    });
+
+    it("should generate html (readonly)", function() {
+      var onInitialized = jasmine.createSpy('onInitialized');
+      var onLoaded = jasmine.createSpy('onLoaded');
+
+      var $ul = $('<ul></ul>');
+      this.$img.jqPhotoTagging({
+        width: 50,
+        height: 50,
         readOnly: true,
+        $tags: $ul,
         tags: [this.tag],
         onInitialized: onInitialized,
         onLoaded: onLoaded
@@ -275,21 +297,13 @@ describe("jQuery PhotoTagging Test Suite", function() {
       expect($wrapper.get(0)).not.toEqual(this.$fixtures.get(0));
       expect($wrapper.get(0)).toEqual($photo.$wrapper.get(0));
 
-      var $tags = this.$img.next();
-      expect($tags).toBeDefined();
-      expect($tags.length).toBe(1);
-      expect($tags.hasClass('jq-phototagging-tags')).toBe(true);
-      expect($tags.html).toHaveBeenCalledWith('');
-      expect($tags.get(0)).toEqual(this.$fixtures.find('ul').get(0));
-      expect($tags.get(0)).toEqual($photo.$tags.get(0));
-
-      var $boxes = $tags.next();
+      var $boxes = this.$img.next();
       expect($boxes).toBeDefined();
       expect($boxes.length).toBe(1);
       expect($boxes.hasClass('jq-phototagging-tag-boxes')).toBe(true);
       expect($boxes.get(0).tagName).toBe('DIV');
 
-      var $lis = $tags.find('li');
+      var $lis = $ul.find('li');
       expect($lis).toBeDefined();
       expect($lis.length).toBe(1);
 
