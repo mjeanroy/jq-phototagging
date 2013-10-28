@@ -34,7 +34,10 @@
   <div class="pic">
     <img id="img-1" src="sample.jpg"/>
   </div>
-  <ul id="tags-1" class="tags"></ul>
+  <div class="tags">
+    <button id="btn-toggle-tags-1" class="btn btn-primary">Disable Tagging</button>
+    <ul id="tags-1"></ul>
+  </div>
 </div>
 <div class="license">
   <p>Image from Arno Meintjes.</p>
@@ -103,7 +106,7 @@
     });
   };
 
-  $('#img-1').jqPhotoTagging({
+  var $tagging = $('#img-1').jqPhotoTagging({
     url: '/tags',
     $tags: '#tags-1',
     tags: [tag1, tag2],
@@ -157,6 +160,15 @@
     tags: [tag3, tag4],
     width: 100,
     height: 100
+  });
+
+  $('#btn-toggle-tags-1').on('click', function() {
+    var ro = $tagging.toggleReadOnly().readOnly();
+    var label = 'Disable Tagging';
+    if (ro) {
+      label = 'Enable Tagging';
+    }
+    $(this).html(label);
   });
 </script>
 </body>

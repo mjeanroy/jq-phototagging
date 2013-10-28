@@ -312,12 +312,12 @@ describe("jQuery PhotoTagging Test Suite", function() {
 
       var $form = $wrapper.find('form');
       expect($form).toBeDefined();
-      expect($form.length).toBe(0);
-      expect($photo.$form).toBeUndefined();
-      expect($photo.$box).toBeUndefined();
-      expect($photo.$input).toBeUndefined();
+      expect($form.length).toBe(1);
+      expect($photo.$form).toBeDefined();
+      expect($photo.$box).toBeDefined();
+      expect($photo.$input).toBeDefined();
 
-      expect(onInitialized).toHaveBeenCalledWith($photo.$wrapper, undefined);
+      expect(onInitialized).toHaveBeenCalledWith($photo.$wrapper, $photo.$form);
       expect(onLoaded).toHaveBeenCalledWith($photo.tags, $photo.$tags);
     });
 
@@ -479,6 +479,39 @@ describe("jQuery PhotoTagging Test Suite", function() {
       expect($photo.position).toHaveBeenCalledWith();
       expect(result).toBe(position);
     });
+
+    it("should call read only without parameter", function() {
+      this.$img.jqPhotoTagging();
+
+      var $photo = this.$img.data('jqPhotoTagging');
+      spyOn($photo, 'readOnly').andReturn(true);
+
+      var result = this.$img.jqPhotoTagging().readOnly();
+      expect($photo.readOnly).toHaveBeenCalledWith();
+      expect(result).toBe(true);
+    });
+
+    it("should call read only with parameter", function() {
+      var $tagging = this.$img.jqPhotoTagging();
+
+      var $photo = this.$img.data('jqPhotoTagging');
+      spyOn($photo, 'readOnly');
+
+      var result = this.$img.jqPhotoTagging().readOnly(true);
+      expect($photo.readOnly).toHaveBeenCalledWith(true);
+      expect(result).toBe($tagging);
+    });
+
+    it("should toggle read only parameter", function() {
+      var $tagging = this.$img.jqPhotoTagging();
+
+      var $photo = this.$img.data('jqPhotoTagging');
+      spyOn($photo, 'toggleReadOnly');
+
+      var result = this.$img.jqPhotoTagging().toggleReadOnly();
+      expect($photo.toggleReadOnly).toHaveBeenCalledWith();
+      expect(result).toBe($tagging);
+    });
   });
 
   describe("jQuery Phototagging: behavior", function() {
@@ -516,18 +549,6 @@ describe("jQuery PhotoTagging Test Suite", function() {
         expect(this.$form.on).toHaveBeenCalledWith('submit.jqphototagging', jasmine.any(Function));
         expect(this.$input.on).toHaveBeenCalledWith('keyup.jqphototagging', jasmine.any(Function));
         expect(this.$iconRemove.on).toHaveBeenCalledWith('click.jqphototagging', jasmine.any(Function));
-      });
-
-      it("should not bind user events on form when tag is readonly", function() {
-        this.$tags.on.reset();
-        this.$img.on.reset();
-        this.$form.on.reset();
-        this.$input.on.reset();
-
-        this.$photo.$form = undefined;
-        this.$photo.bind();
-        expect(this.$tags.on).toHaveBeenCalledWith('mouseenter.jqphototagging', 'li', jasmine.any(Function));
-        expect(this.$tags.on).toHaveBeenCalledWith('mouseleave.jqphototagging', 'li', jasmine.any(Function));
       });
 
       it("should show boxes when user is hover tag name", function() {
@@ -625,6 +646,19 @@ describe("jQuery PhotoTagging Test Suite", function() {
         spyOn(this.$photo.opts, 'onHidden');
         spyOn(this.$photo.opts, 'onClear').andCallThrough();
         spyOn(this.$photo.opts, 'isValid').andCallThrough();
+      });
+
+      it("should show form if user click on image and tagging is disable", function() {
+        this.$photo.opts.readOnly = true;
+        var event = jQuery.Event('click');
+        event.clientX = 200;
+        event.clientY = 150;
+
+        spyOn(this.$photo, 'showForm');
+
+        this.$img.trigger(event);
+
+        expect(this.$photo.showForm).not.toHaveBeenCalledWith(105, 60);
       });
 
       it("should show form if user click on image", function() {
@@ -1110,6 +1144,60 @@ describe("jQuery PhotoTagging Test Suite", function() {
 
         expect(this.$photo.opts.imgSize).toHaveBeenCalledWith(this.tag);
         expect(this.$photo.opts.tagSize).toHaveBeenCalledWith(this.tag);
+      });
+    });
+
+    describe("Toggle Read Only", function() {
+      it("should toggle read only value (turn to true)", function() {
+        this.$photo.opts.readOnly = false;
+        this.$photo.toggleReadOnly();
+        expect(this.$photo.opts.readOnly).toBe(true);
+        expect(this.$photo.$wrapper.addClass).toHaveBeenCalledWith('jq-phototagging-readonly');
+        expect(this.$photo.$wrapper.hasClass('jq-phototagging-readonly')).toBe(true);
+      });
+
+      it("should toggle read only value (turn to false)", function() {
+        this.$photo.opts.readOnly = true;
+        this.$photo.toggleReadOnly();
+        expect(this.$photo.opts.readOnly).toBe(false);
+        expect(this.$photo.$wrapper.removeClass).toHaveBeenCalledWith('jq-phototagging-readonly');
+        expect(this.$photo.$wrapper.hasClass('jq-phototagging-readonly')).toBe(false);
+      });
+
+      it("should get read only value (true)", function() {
+        this.$photo.opts.readOnly = true;
+        var result = this.$photo.readOnly();
+        expect(result).toBe(true);
+      });
+
+      it("should get read only value (false)", function() {
+        this.$photo.opts.readOnly = false;
+        var result = this.$photo.readOnly();
+        expect(result).toBe(false);
+      });
+
+      it("should set read only value (to false)", function() {
+        this.$photo.opts.readOnly = true;
+        this.$photo.readOnly(false);
+        expect(this.$photo.opts.readOnly).toBe(false);
+        expect(this.$photo.$wrapper.removeClass).toHaveBeenCalledWith('jq-phototagging-readonly');
+        expect(this.$photo.$wrapper.hasClass('jq-phototagging-readonly')).toBe(false);
+      });
+
+      it("should set read only value (to true)", function() {
+        this.$photo.opts.readOnly = false;
+        this.$photo.readOnly(true);
+        expect(this.$photo.opts.readOnly).toBe(true);
+        expect(this.$photo.$wrapper.addClass).toHaveBeenCalledWith('jq-phototagging-readonly');
+        expect(this.$photo.$wrapper.hasClass('jq-phototagging-readonly')).toBe(true);
+      });
+
+      it("should not set read only value if value does not change", function() {
+        this.$photo.opts.readOnly = false;
+        this.$photo.readOnly(false);
+        expect(this.$photo.opts.readOnly).toBe(false);
+        expect(this.$photo.$wrapper.addClass).not.toHaveBeenCalledWith();
+        expect(this.$photo.$wrapper.removeClass).not.toHaveBeenCalledWith();
       });
     });
 

@@ -21,7 +21,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-(function (factory) {
+(function(factory) {
   'use strict';
 
   if (typeof define === 'function' && define.amd) {
@@ -345,11 +345,9 @@
       this.$tags = $tags;
       this.$boxes = $boxes;
 
-      if (!this.opts.readOnly) {
-        // Append form used to tag image
-        this.appendForm();
-      }
-      else {
+      this.appendForm();
+
+      if (this.readOnly()) {
         $wrapper.addClass(CSS_RO);
       }
 
@@ -419,6 +417,40 @@
       this.$iconRemove = $iconRemove;
     },
 
+    /** Remove form used to tag picture */
+    removeForm: function() {
+      this.$iconRemove.remove();
+      this.$input.remove();
+      this.$box.remove();
+      this.$form.remove();
+    },
+
+    /** Toggle read only flag (i.e. remove/append form) */
+    toggleReadOnly: function() {
+      this.opts.readOnly = !this.opts.readOnly;
+      if (this.opts.readOnly) {
+        this.hideForm();
+        this.$wrapper.addClass(CSS_RO);
+      }
+      else {
+        this.$wrapper.removeClass(CSS_RO);
+      }
+    },
+
+    /**
+     * Set readonly flag.
+     * @param {boolean?} value New value for readonly flag.
+     * @returns {boolean?} Value of flag if no parameter is given.
+     */
+    readOnly: function(value) {
+      if (!isDefined(value)) {
+        return this.opts.readOnly;
+      }
+      else if (this.opts.readOnly !== value) {
+        this.toggleReadOnly();
+      }
+    },
+
     /** Called when image is fully loaded */
     onLoaded: function() {
       this.computeSize();
@@ -473,10 +505,10 @@
 
     /** Bind user events on form */
     bindForm: function() {
-      if (this.$form) {
-        var that = this;
+      var that = this;
 
-        this.$img.on('click' + NAMESPACE, function(e) {
+      this.$img.on('click' + NAMESPACE, function(e) {
+        if (!that.readOnly()) {
           e.stopPropagation();
 
           var $this = $(this);
@@ -492,24 +524,24 @@
           var y = e.clientY - top - height;
 
           that.showForm(x, y);
-        });
+        }
+      });
 
-        this.$form.on('submit' + NAMESPACE, function(e) {
-          e.preventDefault();
-          that.submit(that.val());
-        });
+      this.$form.on('submit' + NAMESPACE, function(e) {
+        e.preventDefault();
+        that.submit(that.val());
+      });
 
-        this.$input.on('keyup' + NAMESPACE, function(e) {
-          if (e.keyCode === 27) {
-            // Escape key is pressed, hide form
-            that.hideForm();
-          }
-        });
-
-        this.$iconRemove.on('click' + NAMESPACE, function(e) {
+      this.$input.on('keyup' + NAMESPACE, function(e) {
+        if (e.keyCode === 27) {
+          // Escape key is pressed, hide form
           that.hideForm();
-        });
-      }
+        }
+      });
+
+      this.$iconRemove.on('click' + NAMESPACE, function(e) {
+        that.hideForm();
+      });
     },
 
     /** Unbind events used to tag image */
@@ -775,13 +807,9 @@
       this.opts.onDestroyed.call(this);
 
       this.unbind();
+      this.removeForm();
       this.$tags.remove();
       this.$wrapper.unwrap();
-
-      if (this.$form) {
-        this.$input.remove();
-        this.$form.remove();
-      }
 
       for (var i in this) {
         if (this.hasOwnProperty(i)) {
@@ -834,6 +862,28 @@
      */
     this.position = function() {
       return $(this).data(PLUGIN_NAME).position();
+    };
+
+    /**
+     * Get/Set read only flag.
+     * @param {boolean?} value Value to set (optional).
+     * @returns {boolean|this} Value of flag (if no parameter is given) or this object.
+     */
+    this.readOnly = function(value) {
+      if (isDefined(value)) {
+        $(this).data(PLUGIN_NAME).readOnly(!!value);
+        return this;
+      }
+      return $(this).data(PLUGIN_NAME).readOnly();
+    };
+
+    /**
+     * Toggle value of readonly flag.
+     * @returns this object.
+     */
+    this.toggleReadOnly = function() {
+      $(this).data(PLUGIN_NAME).toggleReadOnly();
+      return this;
     };
 
     var args = arguments;
