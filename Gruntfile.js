@@ -12,7 +12,7 @@ module.exports = function(grunt) {
 
     pkg: grunt.file.readJSON('package.json'),
 
-    clean: ['build/'],
+    clean: ['build/', 'release/'],
 
     uglify: {
       options: {
