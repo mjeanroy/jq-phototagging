@@ -557,9 +557,13 @@
      */
     val: function(value) {
       if (isDefined(value)) {
-        var str = typeof value === 'string' ?
+        var str = typeof value === 'string' || value instanceof $ ?
           value :
           this.renderTag(value);
+
+        if (str instanceof $) {
+          str = str.text();
+        }
 
         this.$input.val($.trim(str));
       }
@@ -765,9 +769,13 @@
         .appendTo($tagBox);
 
       var label = this.renderTag(tag);
+      var str = label;
+      if (str instanceof $) {
+        str = str.text();
+      }
 
       $('<span></span>')
-        .html(label)
+        .html(str)
         .appendTo($tagBox);
 
       var $li = $('<li></li>')

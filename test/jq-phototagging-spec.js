@@ -1029,6 +1029,13 @@ describe("jQuery PhotoTagging Test Suite", function() {
         expect(this.$photo.$input.val()).toBe('foobar');
       });
 
+      it("should set value with a jquery node", function() {
+        this.$photo.val($('<span>foobar</span>'));
+
+        expect(this.$photo.$input.val).toHaveBeenCalledWith('foobar');
+        expect(this.$photo.$input.val()).toBe('foobar');
+      });
+
       it("should set trimmed value", function() {
         this.$photo.val(' foobar ');
 
@@ -1155,6 +1162,42 @@ describe("jQuery PhotoTagging Test Suite", function() {
         expect($box.css('width')).toBe('50px');
         expect($divBox.css('height')).toBe('50px');
         expect($spanBox.html()).toBe('my tag');
+
+        expect(this.$photo.opts.imgSize).toHaveBeenCalledWith(this.tag);
+        expect(this.$photo.opts.tagSize).toHaveBeenCalledWith(this.tag);
+      });
+
+      it("should append tag using custom size functions", function() {
+        this.$photo.opts.label = function() {
+          return $('<span>foobar</span>');
+        };
+
+        this.$photo.opts.imgSize = jasmine.createSpy('imgSize').andReturn({
+          width: 100,
+          height: 100
+        });
+
+        this.$photo.opts.tagSize = jasmine.createSpy('tagSize').andReturn({
+          x: 0,
+          y: 0,
+          width: 50,
+          height: 50
+        });
+
+        this.$photo.$img.width.andReturn(100);
+        this.$photo.$img.height.andReturn(100);
+
+        this.$photo.appendTag(this.tag);
+
+        var $box = this.$boxes.find('> div');
+        var $divBox = $box.find('> div');
+        var $spanBox = $box.find('> span');
+
+        expect($box.css('left')).toBe('0px');
+        expect($box.css('top')).toBe('0px');
+        expect($box.css('width')).toBe('50px');
+        expect($divBox.css('height')).toBe('50px');
+        expect($spanBox.html()).toBe('foobar');
 
         expect(this.$photo.opts.imgSize).toHaveBeenCalledWith(this.tag);
         expect(this.$photo.opts.tagSize).toHaveBeenCalledWith(this.tag);
