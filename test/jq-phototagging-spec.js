@@ -52,6 +52,7 @@ describe("jQuery PhotoTagging Test Suite", function() {
         url: '',
         method: 'POST',
         dataType: 'json',
+        saveContentType : 'application/x-www-form-urlencoded; charset=UTF-8',
         tags: [],
         $tags: null,
         label: jasmine.any(Function),
@@ -75,7 +76,8 @@ describe("jQuery PhotoTagging Test Suite", function() {
     it("should initialize with custom options", function() {
       this.$img.jqPhotoTagging({
         width: 50,
-        height: 50
+        height: 50,
+        saveContentType: 'application/json'
       });
 
       // trigger images loaded event
@@ -94,6 +96,7 @@ describe("jQuery PhotoTagging Test Suite", function() {
         url: '',
         method: 'POST',
         dataType: 'json',
+        saveContentType : 'application/json',
         tags: [],
         $tags: null,
         label: jasmine.any(Function),
@@ -122,6 +125,7 @@ describe("jQuery PhotoTagging Test Suite", function() {
         url: '',
         method: 'POST',
         dataType: 'json',
+        saveContentType : 'application/x-www-form-urlencoded; charset=UTF-8',
         tags: [],
         $tags: null,
         label: jasmine.any(Function),
@@ -155,6 +159,7 @@ describe("jQuery PhotoTagging Test Suite", function() {
       this.$img.attr('data-url', '/foo');
       this.$img.attr('data-method', 'JSONP');
       this.$img.attr('data-data-type', 'xml');
+      this.$img.attr('data-save-content-type', 'application/json');
       this.$img.attr('data-read-only', 'true');
       this.$img.attr('data-label', 'name');
       this.$img.attr('data-tags', '#tags');
@@ -171,6 +176,7 @@ describe("jQuery PhotoTagging Test Suite", function() {
         url: '/foo',
         method: 'JSONP',
         dataType: 'xml',
+        saveContentType : 'application/json',
         tags: [],
         $tags: '#tags',
         label: 'name',
@@ -935,7 +941,56 @@ describe("jQuery PhotoTagging Test Suite", function() {
             imgWidth: 50,
             imgHeight: 60
           },
-          dataType: 'json'
+          dataType: 'json',
+          contentType: 'application/x-www-form-urlencoded; charset=UTF-8'
+        });
+
+        expect(this.$photo.$submitting).toBe(true);
+
+        expect(this.xhr.done).toHaveBeenCalledWith(jasmine.any(Function));
+        expect(this.xhr.fail).toHaveBeenCalledWith(jasmine.any(Function));
+        expect(this.xhr.always).toHaveBeenCalledWith(jasmine.any(Function));
+
+        this.$photo.opts.onSavedFailed = jasmine.createSpy('onSavedFailed');
+        this.xhr.fail.argsForCall[0][0]();
+        expect(this.$photo.opts.onSavedFailed).toHaveBeenCalled();
+        expect(this.$photo.$submitting).toBe(true);
+
+        this.$photo.opts.onSavedSuccess = jasmine.createSpy('onSavedSuccess');
+        this.xhr.done.argsForCall[0][0](this.tag);
+        expect(this.$photo.opts.onSavedSuccess).toHaveBeenCalledWith(this.tag);
+        expect(this.$photo.appendTags).toHaveBeenCalledWith(this.tag);
+        expect(this.$photo.hideForm).toHaveBeenCalled();
+        expect(this.$input.val).toHaveBeenCalledWith('');
+        expect(this.$photo.$submitting).toBe(true);
+
+        this.xhr.always.argsForCall[0][0]();
+        expect(this.$photo.$submitting).toBe(false);
+      });
+
+      it("should submit form with a json content type", function() {
+        var json = '{"value": "foobar", "x": 10, "y": 20, "width": 100, "height": 200, "imgWidth": 50, "imgHeight": 60}';
+        window.JSON = jasmine.createSpyObj('JSON', ['stringify']);
+        window.JSON.stringify.andReturn(json);
+
+        this.$photo.opts.saveContentType = 'application/json';
+
+        this.$photo.x = 10;
+        this.$photo.y = 20;
+        this.$photo.width = 100;
+        this.$photo.height = 200;
+        this.$photo.$imgWidth = 50;
+        this.$photo.$imgHeight = 60;
+
+        this.$photo.submit('foobar');
+
+        expect(this.$photo.opts.isValid).toHaveBeenCalled();
+        expect($.ajax).toHaveBeenCalledWith({
+          url: '/foo',
+          type: 'POST',
+          data: json,
+          dataType: 'json',
+          contentType: 'application/json'
         });
 
         expect(this.$photo.$submitting).toBe(true);
@@ -991,7 +1046,8 @@ describe("jQuery PhotoTagging Test Suite", function() {
             imgHeight: 60,
             name: 'foo'
           },
-          dataType: 'json'
+          dataType: 'json',
+          contentType: 'application/x-www-form-urlencoded; charset=UTF-8'
         });
       });
 

@@ -171,6 +171,20 @@
       return obj !== undefined && obj !== null;
     };
 
+    /**
+     * Check if string starts with a given pattern.
+     * @param {string} str String to check.
+     * @param {string} start Start pattern.
+     * @returns {*} True if string starts with given pattern, false otherwise.
+     */
+    var startsWith = function(str, start) {
+      if (String.prototype.startsWith) {
+        return str.startsWith(start);
+      } else {
+        return str.indexOf(start) === 0;
+      }
+    };
+
     /** Generate a unique id */
     var uniqId = function($ids) {
       var exist = true;
@@ -377,6 +391,7 @@
         datas.url = data($img, 'url');
         datas.method = data($img, 'method');
         datas.dataType = data($img, 'data-type');
+        datas.saveContentType = data($img, 'save-content-type');
         datas.readOnly = data($img, 'read-only');
         datas.label = data($img, 'label');
         datas.$tags = data($img, 'tags');
@@ -686,11 +701,17 @@
             return;
           }
 
+          var contentType = that.opts.saveContentType;
+          if (startsWith(contentType, 'application/json') && JSON && JSON.stringify) {
+            params = JSON.stringify(params);
+          }
+
           var xhr = $.ajax({
             url: that.opts.url,
             type: that.opts.method,
             data: params,
-            dataType: that.opts.dataType
+            dataType: that.opts.dataType,
+            contentType: contentType
           });
 
           xhr.done(function(data) {
@@ -946,6 +967,7 @@
       url: '',
       method: 'POST',
       dataType: 'json',
+      saveContentType: 'application/x-www-form-urlencoded; charset=UTF-8',
       readOnly: false,
       label: renderAttribute,
       tagSize: tagSize,
