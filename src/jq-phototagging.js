@@ -861,6 +861,7 @@
         that.unbind();
         that.removeForm();
         that.$tags.remove();
+        that.$boxes.remove();
         that.$img.unwrap();
 
         for (var i in that) {

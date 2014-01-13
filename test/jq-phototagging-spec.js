@@ -1360,6 +1360,7 @@ describe("jQuery PhotoTagging Test Suite", function() {
         var $tags = this.$photo.$tags;
         var $wrapper = this.$photo.$wrapper;
         var $img = this.$photo.$img;
+        var $boxes = this.$photo.$boxes;
 
         $.fn.unwrap.reset();
 
@@ -1375,6 +1376,7 @@ describe("jQuery PhotoTagging Test Suite", function() {
         expect($img.parent().hasClass('jq-phototagging-wrapper')).toBe(false);
         expect($tags.remove).toHaveBeenCalled();
         expect($tags.off).toHaveBeenCalledWith('.jqphototagging');
+        expect($boxes.remove).toHaveBeenCalled();
 
         expect(this.$photo.$img).toBe(null);
         expect(this.$photo.$tags).toBe(null);
