@@ -861,7 +861,7 @@
         that.unbind();
         that.removeForm();
         that.$tags.remove();
-        that.$wrapper.unwrap();
+        that.$img.unwrap();
 
         for (var i in that) {
           if (that.hasOwnProperty(i)) {

@@ -1339,7 +1339,7 @@ describe("jQuery PhotoTagging Test Suite", function() {
         var $tags = this.$photo.$tags;
         var $form = this.$photo.$form;
         var $img = this.$photo.$img;
-        var $iconRemove = this.$photo.$iconRemove;
+		var $iconRemove = this.$photo.$iconRemove;
 
         this.$photo.unbind();
         expect($tags.off).toHaveBeenCalledWith('.jqphototagging');
@@ -1359,13 +1359,20 @@ describe("jQuery PhotoTagging Test Suite", function() {
       it("should destroy plugin", function() {
         var $tags = this.$photo.$tags;
         var $wrapper = this.$photo.$wrapper;
+        var $img = this.$photo.$img;
+
+        $.fn.unwrap.reset();
 
         spyOn(this.$photo.opts, 'onDestroyed');
         var onDestroyed = this.$photo.opts.onDestroyed;
 
+        // Check that wrapper is the parent
+        expect($img.parent().hasClass('jq-phototagging-wrapper')).toBe(true);
+
         this.$photo.destroy();
         expect(onDestroyed).toHaveBeenCalled();
-        expect($wrapper.unwrap).toHaveBeenCalled();
+        expect($img.unwrap).toHaveBeenCalled();
+        expect($img.parent().hasClass('jq-phototagging-wrapper')).toBe(false);
         expect($tags.remove).toHaveBeenCalled();
         expect($tags.off).toHaveBeenCalledWith('.jqphototagging');
 
