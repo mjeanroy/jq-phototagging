@@ -878,7 +878,13 @@
 
       /** Destroy plugin */
       that.destroy = function() {
-        $that.data(PLUGIN_NAME).destroy();
+        var plugin = $that.data(PLUGIN_NAME);
+        if (plugin) {
+          // Destroy internal data
+          plugin.destroy();
+        }
+
+        // Remove data from DOM
         $that.removeData(PLUGIN_NAME);
       };
 
