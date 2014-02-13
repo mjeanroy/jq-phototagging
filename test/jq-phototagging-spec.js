@@ -43,7 +43,10 @@ describe("jQuery PhotoTagging Test Suite", function() {
 
   describe("jQuery Phototagging: initialization", function() {
     it("should have default options", function() {
+      // WHEN
       var defaults = jQuery.fn.jqPhotoTagging.options;
+
+      // THEN
       expect(defaults).toBeDefined();
       expect(defaults).toEqual({
         width: 100,
@@ -74,11 +77,17 @@ describe("jQuery PhotoTagging Test Suite", function() {
     });
 
     it("should initialize with custom options", function() {
-      this.$img.jqPhotoTagging({
+      // GIVEN
+      var options = {
         width: 50,
         height: 50,
         saveContentType: 'application/json'
-      });
+      };
+
+      // WHEN
+      this.$img.jqPhotoTagging(options);
+
+      // THEN
 
       // trigger images loaded event
       this.$img.trigger('load');
@@ -147,6 +156,7 @@ describe("jQuery PhotoTagging Test Suite", function() {
     });
 
     it("should initialize with data attributes", function() {
+      // GIVEN
       $('body').append(this.$fixtures);
 
       expect(this.$img.data('jqPhotoTagging')).toBeFalsy();
@@ -164,7 +174,10 @@ describe("jQuery PhotoTagging Test Suite", function() {
       this.$img.attr('data-label', 'name');
       this.$img.attr('data-tags', '#tags');
 
+      // WHEN
       this.$img.jqPhotoTagging();
+
+      // THEN
       expect(this.$img.data('jqPhotoTagging')).toBeDefined();
 
       var plugin = this.$img.data('jqPhotoTagging');
@@ -198,22 +211,27 @@ describe("jQuery PhotoTagging Test Suite", function() {
     });
 
     it("should generate html", function() {
+      // GIVEN
       var onInitialized = jasmine.createSpy('onInitialized');
       var onLoaded = jasmine.createSpy('onLoaded');
 
       var $ul = $('<ul></ul>');
-      this.$img.jqPhotoTagging({
+      var options = {
         width: 50,
         height: 50,
         $tags: $ul,
         tags: [this.tag],
         onInitialized: onInitialized,
         onLoaded: onLoaded
-      });
+      };
+
+      // WHEN
+      this.$img.jqPhotoTagging(options);
 
       // trigger images loaded event
       this.$img.trigger('load');
 
+      // THEN
       var $photo = this.$img.data('jqPhotoTagging');
       expect($photo.$img).toBeDefined();
       expect($photo.$img.get(0)).toEqual(this.$img.get(0));
@@ -250,20 +268,25 @@ describe("jQuery PhotoTagging Test Suite", function() {
     });
 
     it("should generate html without tag list", function() {
+      // GIVEN
       var onInitialized = jasmine.createSpy('onInitialized');
       var onLoaded = jasmine.createSpy('onLoaded');
 
-      this.$img.jqPhotoTagging({
+      var options = {
         width: 50,
         height: 50,
         tags: [this.tag],
         onInitialized: onInitialized,
         onLoaded: onLoaded
-      });
+      };
+
+      // WHEN
+      this.$img.jqPhotoTagging(options);
 
       // trigger images loaded event
       this.$img.trigger('load');
 
+      // THEN
       var $photo = this.$img.data('jqPhotoTagging');
       expect($photo.$img).toBeDefined();
       expect($photo.$img.get(0)).toEqual(this.$img.get(0));
@@ -274,11 +297,12 @@ describe("jQuery PhotoTagging Test Suite", function() {
     });
 
     it("should generate html (readonly)", function() {
+      // GIVEN
       var onInitialized = jasmine.createSpy('onInitialized');
       var onLoaded = jasmine.createSpy('onLoaded');
 
       var $ul = $('<ul></ul>');
-      this.$img.jqPhotoTagging({
+      var options = {
         width: 50,
         height: 50,
         readOnly: true,
@@ -286,11 +310,15 @@ describe("jQuery PhotoTagging Test Suite", function() {
         tags: [this.tag],
         onInitialized: onInitialized,
         onLoaded: onLoaded
-      });
+      };
+
+      // WHEN
+      this.$img.jqPhotoTagging(options);
 
       // trigger images loaded event
       this.$img.trigger('load');
 
+      // THEN
       var $photo = this.$img.data('jqPhotoTagging');
       expect($photo.$img).toBeDefined();
       expect($photo.$img.get(0)).toEqual(this.$img.get(0));
@@ -342,8 +370,10 @@ describe("jQuery PhotoTagging Test Suite", function() {
     });
 
     it("should initialize plugin with needed variable when form is not readonly", function() {
+      // WHEN
       this.$img.jqPhotoTagging();
 
+      // THEN
       var $photo = this.$img.data('jqPhotoTagging');
       expect($photo.fx).toBe(0);
       expect($photo.x).toBe(0);
@@ -365,91 +395,120 @@ describe("jQuery PhotoTagging Test Suite", function() {
     });
 
     it("should call val of plugin", function() {
+      // GIVEN
       this.$img.jqPhotoTagging();
 
       var $photo = this.$img.data('jqPhotoTagging');
       spyOn($photo, 'val');
 
+      // WHEN
       var result = this.$img.jqPhotoTagging().val('foobar');
+
+      // THEN
       expect(result).toBe(this.$img.jqPhotoTagging());
       expect($photo.val).toHaveBeenCalledWith('foobar');
     });
 
     it("should call val of plugin with a string parameter", function() {
+      // GIVEN
       this.$img.jqPhotoTagging();
 
       var $photo = this.$img.data('jqPhotoTagging');
       spyOn($photo, 'val');
 
+      // WHEN
       var result = this.$img.jqPhotoTagging('val', 'foobar');
+
+      // THEN
       expect(result).toBe(this.$img.jqPhotoTagging());
       expect($photo.val).toHaveBeenCalledWith('foobar');
     });
 
     it("should get val of plugin", function() {
+      // GIVEN
       this.$img.jqPhotoTagging();
 
       var $photo = this.$img.data('jqPhotoTagging');
       spyOn($photo, 'val').andReturn('foobar');
 
+      // WHEN
       var value = this.$img.jqPhotoTagging().val();
+
+      // THEN
       expect($photo.val).toHaveBeenCalled();
       expect(value).toBe('foobar');
     });
 
     it("should submit tag", function() {
+      // GIVEN
       this.$img.jqPhotoTagging();
 
       var $photo = this.$img.data('jqPhotoTagging');
       spyOn($photo, 'submit');
       spyOn($photo, 'val').andReturn('foobar');
 
+      // WHEN
       var result = this.$img.jqPhotoTagging().submit();
+
+      // THEN
       expect($photo.val).toHaveBeenCalled();
       expect($photo.submit).toHaveBeenCalledWith('foobar');
       expect(result).toBe(this.$img.jqPhotoTagging());
     });
 
     it("should submit tag with a string parameter", function() {
+      // GIVEN
       this.$img.jqPhotoTagging();
 
       var $photo = this.$img.data('jqPhotoTagging');
       spyOn($photo, 'submit');
       spyOn($photo, 'val').andReturn('foobar');
 
+      // WHEN
       var result = this.$img.jqPhotoTagging('submit');
+
+      // THEN
       expect($photo.val).toHaveBeenCalled();
       expect($photo.submit).toHaveBeenCalledWith('foobar');
       expect(result).toBe(this.$img.jqPhotoTagging());
     });
 
     it("should set value and submit tag", function() {
+      // GIVEN
       this.$img.jqPhotoTagging();
 
       var $photo = this.$img.data('jqPhotoTagging');
       spyOn($photo, 'submit');
       spyOn($photo, 'val').andReturn('foobar');
 
+      // WHEN
       var result = this.$img.jqPhotoTagging().submit('foobar');
+
+      // THEN
       expect($photo.val).toHaveBeenCalledWith('foobar');
       expect($photo.submit).toHaveBeenCalledWith('foobar');
       expect(result).toBe(this.$img.jqPhotoTagging());
     });
 
     it("should set value and submit tag with a string parameter", function() {
+      // GIVEN
       this.$img.jqPhotoTagging();
 
       var $photo = this.$img.data('jqPhotoTagging');
       spyOn($photo, 'submit');
       spyOn($photo, 'val').andReturn('foobar');
 
+      // WHEN
       var result = this.$img.jqPhotoTagging('submit', 'foobar');
+
+      // THEN
       expect($photo.val).toHaveBeenCalledWith('foobar');
       expect($photo.submit).toHaveBeenCalledWith('foobar');
       expect(result).toBe(this.$img.jqPhotoTagging());
     });
 
     it("should set tag value and submit tag", function() {
+      // GIVEN
       this.$img.jqPhotoTagging();
 
       var $photo = this.$img.data('jqPhotoTagging');
@@ -460,13 +519,17 @@ describe("jQuery PhotoTagging Test Suite", function() {
         name: 'foobar'
       };
 
+      // WHEN
       var result = this.$img.jqPhotoTagging().submit(tag);
+
+      // THEN
       expect($photo.val).toHaveBeenCalledWith(tag);
       expect($photo.submit).toHaveBeenCalledWith('foobar');
       expect(result).toBe(this.$img.jqPhotoTagging());
     });
 
     it("should set tag value and submit tag with a string parameter", function() {
+      // GIVEN
       this.$img.jqPhotoTagging();
 
       var $photo = this.$img.data('jqPhotoTagging');
@@ -477,13 +540,17 @@ describe("jQuery PhotoTagging Test Suite", function() {
         name: 'foobar'
       };
 
+      // WHEN
       var result = this.$img.jqPhotoTagging('submit', tag);
+
+      // THEN
       expect($photo.val).toHaveBeenCalledWith(tag);
       expect($photo.submit).toHaveBeenCalledWith('foobar');
       expect(result).toBe(this.$img.jqPhotoTagging());
     });
 
     it("should get current position", function() {
+      // GIVEN
       this.$img.jqPhotoTagging();
 
       var $photo = this.$img.data('jqPhotoTagging');
@@ -495,40 +562,55 @@ describe("jQuery PhotoTagging Test Suite", function() {
 
       spyOn($photo, 'position').andReturn(position);
 
+      // WHEN
       var result = this.$img.jqPhotoTagging().position();
+
+      // THEN
       expect($photo.position).toHaveBeenCalledWith();
       expect(result).toBe(position);
     });
 
     it("should call read only without parameter", function() {
+      // GIVEN
       this.$img.jqPhotoTagging();
 
       var $photo = this.$img.data('jqPhotoTagging');
       spyOn($photo, 'readOnly').andReturn(true);
 
+      // WHEN
       var result = this.$img.jqPhotoTagging().readOnly();
+
+      // THEN
       expect($photo.readOnly).toHaveBeenCalledWith();
       expect(result).toBe(true);
     });
 
     it("should call read only with parameter", function() {
+      // GIVEN
       var $tagging = this.$img.jqPhotoTagging();
 
       var $photo = this.$img.data('jqPhotoTagging');
       spyOn($photo, 'readOnly');
 
+      // WHEN
       var result = this.$img.jqPhotoTagging().readOnly(true);
+
+      // THEN
       expect($photo.readOnly).toHaveBeenCalledWith(true);
       expect(result).toBe($tagging);
     });
 
     it("should toggle read only parameter", function() {
+      // GIVEN
       var $tagging = this.$img.jqPhotoTagging();
 
       var $photo = this.$img.data('jqPhotoTagging');
       spyOn($photo, 'toggleReadOnly');
 
+      // WHEN
       var result = this.$img.jqPhotoTagging().toggleReadOnly();
+
+      // THEN
       expect($photo.toggleReadOnly).toHaveBeenCalledWith();
       expect(result).toBe($tagging);
     });
@@ -564,7 +646,6 @@ describe("jQuery PhotoTagging Test Suite", function() {
       it("should bind user events", function() {
         expect(this.$tags.on).toHaveBeenCalledWith('mouseenter.jqphototagging', 'li', jasmine.any(Function));
         expect(this.$tags.on).toHaveBeenCalledWith('mouseleave.jqphototagging', 'li', jasmine.any(Function));
-
         expect(this.$img.on).toHaveBeenCalledWith('click.jqphototagging', jasmine.any(Function));
         expect(this.$form.on).toHaveBeenCalledWith('submit.jqphototagging', jasmine.any(Function));
         expect(this.$input.on).toHaveBeenCalledWith('keyup.jqphototagging', jasmine.any(Function));
@@ -572,40 +653,59 @@ describe("jQuery PhotoTagging Test Suite", function() {
       });
 
       it("should show boxes when user is hover tag name", function() {
+        // GIVEN
         var $li = this.$tags.find('li');
         var $box = this.$boxes.find('div');
+
+        // WHEN
         $li.trigger('mouseenter');
+
+        // THEN
         expect($box.hasClass('jq-phototagging-visible')).toBe(true);
       });
 
       it("should hide boxes when user is not hover tag name", function() {
+        // GIVEN
         var $li = this.$tags.find('li');
         var $box = this.$boxes.find('div');
         $box.addClass('jq-phototagging-visible');
 
+        // WHEN
         $li.trigger('mouseleave');
+
+        // THEN
         expect($box.hasClass('jq-phototagging-visible')).toBe(false);
       });
 
       it("should hide form when user press escape key in input", function() {
+        // GIVEN
         spyOn(this.$photo, 'hideForm');
 
         var event = jQuery.Event('keyup');
         event.keyCode = 27;
+
+        // WHEN
         this.$input.trigger(event);
+
+        // THEN
         expect(this.$photo.hideForm).toHaveBeenCalled();
       });
 
       it("should hide form when user click on remove icon", function() {
+        // GIVEN
         spyOn(this.$photo, 'hideForm');
 
+        // WHEN
         this.$iconRemove.trigger('click');
+
+        // THEN
         expect(this.$photo.hideForm).toHaveBeenCalled();
       });
     });
 
     describe("Compute Size", function() {
       it("should compute size with form", function() {
+        // GIVEN
         this.$photo.width = 20;
         spyOn(this.$photo.$img, 'outerHeight').andReturn(100);
         spyOn(this.$photo.$img, 'outerWidth').andReturn(200);
@@ -613,7 +713,10 @@ describe("jQuery PhotoTagging Test Suite", function() {
         spyOn(this.$photo.$form, 'outerHeight').andReturn(50);
         spyOn(this.$photo.$form, 'outerWidth').andReturn(60);
 
+        // WHEN
         this.$photo.computeSize();
+
+        // THEN
         expect(this.$photo.$imgHeight).toBe(100);
         expect(this.$photo.$imgWidth).toBe(200);
         expect(this.$photo.formWidth).toBe(60);
@@ -622,11 +725,15 @@ describe("jQuery PhotoTagging Test Suite", function() {
       });
 
       it("should compute size without form", function() {
+        // GIVEN
         this.$photo.$form = undefined;
         spyOn(this.$photo.$img, 'outerHeight').andReturn(100);
         spyOn(this.$photo.$img, 'outerWidth').andReturn(200);
 
+        // WHEN
         this.$photo.computeSize();
+
+        // THEN
         expect(this.$photo.$imgHeight).toBe(100);
         expect(this.$photo.$imgWidth).toBe(200);
         expect(this.$photo.formWidth).toBe(0);
@@ -669,6 +776,7 @@ describe("jQuery PhotoTagging Test Suite", function() {
       });
 
       it("should show form if user click on image and tagging is disable", function() {
+        // GIVEN
         this.$photo.opts.readOnly = true;
         var event = jQuery.Event('click');
         event.clientX = 200;
@@ -676,12 +784,15 @@ describe("jQuery PhotoTagging Test Suite", function() {
 
         spyOn(this.$photo, 'showForm');
 
+        // WHEN
         this.$img.trigger(event);
 
+        // THEN
         expect(this.$photo.showForm).not.toHaveBeenCalledWith(105, 60);
       });
 
       it("should show form if user click on image", function() {
+        // GIVEN
         this.$photo.formWidth = 50;
         this.$photo.formHeight = 100;
 
@@ -699,8 +810,10 @@ describe("jQuery PhotoTagging Test Suite", function() {
 
         spyOn(this.$photo, 'showForm');
 
+        // WHEN
         this.$img.trigger(event);
 
+        // THEN
         // Expected x = clientX - (offset.left - scrollLeft) - formWidth / 2
         //            = 200 - (100 - 30) - (50 / 2) = 105
         // Expected y = clientY - (offset.top - scrollTop) - formHeight / 2
@@ -713,30 +826,48 @@ describe("jQuery PhotoTagging Test Suite", function() {
       });
 
       it("should submit form if user submit a value", function() {
+        // GIVEN
         spyOn(this.$photo, 'submit');
         this.$input.val('foobar');
+
+        // WHEN
         this.$form.trigger('submit');
+
+        // THEN
         expect(this.$photo.submit).toHaveBeenCalledWith('foobar');
       });
 
       it("should not submit form if user does not submit a value", function() {
+        // GIVEN
         this.$input.val('');
+
+        // WHEN
         this.$form.trigger('submit');
+
+        // THEN
         expect($.ajax).not.toHaveBeenCalled();
       });
 
       it("should not submit form if user submit spaces", function() {
+        // GIVEN
         this.$input.val('  ');
+
+        // WHEN
         this.$form.trigger('submit');
+
+        // THEN
         expect($.ajax).not.toHaveBeenCalled();
       });
 
       it("should show form at given position when form width is equal to box width", function() {
+        // GIVEN
         var x = 400;
         var y = 200;
 
+        // WHEN
         this.$photo.showForm(x, y);
 
+        // THEN
         expect(this.$photo.fx).toBe(400);
         expect(this.$photo.x).toBe(400);
         expect(this.$photo.y).toBe(200);
@@ -761,11 +892,14 @@ describe("jQuery PhotoTagging Test Suite", function() {
       });
 
       it("should show form at given position when form width is greater than box width", function() {
+        // GIVEN
         this.$photo.marginWidth = 25;
         this.$photo.formWidth = this.$photo.width + (this.$photo.marginWidth * 2);
 
+        // WHEN
         this.$photo.showForm(300, 200);
 
+        // THEN
         expect(this.$photo.fx).toBe(300);
         expect(this.$photo.x).toBe(325);
         expect(this.$photo.y).toBe(200);
@@ -790,8 +924,10 @@ describe("jQuery PhotoTagging Test Suite", function() {
       });
 
       it("should show form aligned on the left when form is at the left of image (out of bounds)", function() {
+        // WHEN
         this.$photo.showForm(-5, 200);
 
+        // THEN
         expect(this.$photo.fx).toBe(0);
         expect(this.$photo.x).toBe(0);
         expect(this.$photo.y).toBe(200);
@@ -816,8 +952,10 @@ describe("jQuery PhotoTagging Test Suite", function() {
       });
 
       it("should show form aligned on the right when form is at the right of image (out of bounds)", function() {
+        // WHEN
         this.$photo.showForm(780, 200);
 
+        // THEN
         expect(this.$photo.fx).toBe(700);
         expect(this.$photo.x).toBe(700);
         expect(this.$photo.y).toBe(200);
@@ -842,8 +980,10 @@ describe("jQuery PhotoTagging Test Suite", function() {
       });
 
       it("should show form aligned at the top when form is at the top of image (out of bounds)", function() {
+        // WHEN
         this.$photo.showForm(300, -10);
 
+        // THEN
         expect(this.$photo.fx).toBe(300);
         expect(this.$photo.x).toBe(300);
         expect(this.$photo.y).toBe(0);
@@ -868,8 +1008,10 @@ describe("jQuery PhotoTagging Test Suite", function() {
       });
 
       it("should show form aligned at the bottom when form is at the bottom of image (out of bounds)", function() {
+        // WHEN
         this.$photo.showForm(300, 480);
 
+        // THEN
         expect(this.$photo.fx).toBe(300);
         expect(this.$photo.x).toBe(300);
         expect(this.$photo.y).toBe(400);
@@ -894,8 +1036,13 @@ describe("jQuery PhotoTagging Test Suite", function() {
       });
 
       it("should hide form", function() {
+        // GIVEN
         this.$form.addClass('jq-phototagging-visible');
+
+        // WHEN
         this.$photo.hideForm();
+
+        // THEN
         expect(this.$form.fadeOut).toHaveBeenCalled();
         expect(this.$photo.opts.onHidden).toHaveBeenCalled();
 
@@ -904,21 +1051,32 @@ describe("jQuery PhotoTagging Test Suite", function() {
       });
 
       it("should not submit if form is submitting", function() {
+        // GIVEN
         this.$photo.$submitting = true;
+
+        // WHEN
         this.$photo.submit('foobar');
+
+        // THEN
         expect(this.$photo.opts.isValid).not.toHaveBeenCalled();
         expect($.ajax).not.toHaveBeenCalled();
       });
 
       it("should not submit an invalid value", function() {
+        // GIVEN
         this.$photo.opts.isValid.andReturn(false);
+
+        // WHEN
         this.$photo.submit('foobar');
+
+        // THEN
         expect(this.$photo.opts.isValid).toHaveBeenCalled();
         expect(this.$photo.$submitting).toBe(false);
         expect($.ajax).not.toHaveBeenCalled();
       });
 
       it("should submit form", function() {
+        // GIVEN
         this.$photo.x = 10;
         this.$photo.y = 20;
         this.$photo.width = 100;
@@ -926,8 +1084,10 @@ describe("jQuery PhotoTagging Test Suite", function() {
         this.$photo.$imgWidth = 50;
         this.$photo.$imgHeight = 60;
 
+        // WHEN
         this.$photo.submit('foobar');
 
+        // THEN
         expect(this.$photo.opts.isValid).toHaveBeenCalled();
         expect($.ajax).toHaveBeenCalledWith({
           url: '/foo',
@@ -969,6 +1129,7 @@ describe("jQuery PhotoTagging Test Suite", function() {
       });
 
       it("should submit form with a json content type", function() {
+        // GIVEN
         var json = '{"value": "foobar", "x": 10, "y": 20, "width": 100, "height": 200, "imgWidth": 50, "imgHeight": 60}';
         window.JSON = jasmine.createSpyObj('JSON', ['stringify']);
         window.JSON.stringify.andReturn(json);
@@ -982,8 +1143,10 @@ describe("jQuery PhotoTagging Test Suite", function() {
         this.$photo.$imgWidth = 50;
         this.$photo.$imgHeight = 60;
 
+        // WHEN
         this.$photo.submit('foobar');
 
+        // THEN
         expect(this.$photo.opts.isValid).toHaveBeenCalled();
         expect($.ajax).toHaveBeenCalledWith({
           url: '/foo',
@@ -1017,6 +1180,7 @@ describe("jQuery PhotoTagging Test Suite", function() {
       });
 
       it("should submit form with custom parameters", function() {
+        // GIVEN
         spyOn(this.$photo.opts, 'paramsFn').andCallFake(function(param) {
           delete param.value;
           return {
@@ -1031,7 +1195,10 @@ describe("jQuery PhotoTagging Test Suite", function() {
         this.$photo.$imgWidth = 50;
         this.$photo.$imgHeight = 60;
 
+        // WHEN
         this.$photo.submit('foobar');
+
+        // THEN
         expect(this.$photo.opts.paramsFn).toHaveBeenCalled();
         expect(this.$photo.opts.isValid).toHaveBeenCalled();
         expect($.ajax).toHaveBeenCalledWith({
@@ -1052,14 +1219,17 @@ describe("jQuery PhotoTagging Test Suite", function() {
       });
 
       it("should submit form and transform result tag", function() {
+        // GIVEN
         spyOn(this.$photo.opts, 'resultFn').andCallFake(function(result) {
           result.x += 10;
           result.y += 10;
           return result;
         });
 
+        // WHEN
         this.$photo.submit('foobar');
 
+        // THEN
         expect($.ajax).toHaveBeenCalled();
         expect(this.xhr.done).toHaveBeenCalledWith(jasmine.any(Function));
         expect(this.xhr.fail).toHaveBeenCalledWith(jasmine.any(Function));
@@ -1079,80 +1249,110 @@ describe("jQuery PhotoTagging Test Suite", function() {
       });
 
       it("should set value", function() {
+        // WHEN
         this.$photo.val('foobar');
 
+        // THEN
         expect(this.$photo.$input.val).toHaveBeenCalledWith('foobar');
         expect(this.$photo.$input.val()).toBe('foobar');
       });
 
       it("should set value with a jquery node", function() {
+        // GIVEN
         this.$photo.val($('<span>foobar</span>'));
 
+        // THEN
         expect(this.$photo.$input.val).toHaveBeenCalledWith('foobar');
         expect(this.$photo.$input.val()).toBe('foobar');
       });
 
       it("should set trimmed value", function() {
+        // WHEN
         this.$photo.val(' foobar ');
 
+        // THEN
         expect(this.$photo.$input.val).toHaveBeenCalledWith('foobar');
         expect(this.$photo.$input.val()).toBe('foobar');
       });
 
       it("should set value from tag object", function() {
+        // GIVEN
         var tag = {
           name: 'foobar'
         };
 
+        // WHEN
         this.$photo.val(tag);
 
+        // THEN
         expect(this.$photo.$input.val).toHaveBeenCalledWith('foobar');
         expect(this.$photo.$input.val()).toBe('foobar');
       });
 
       it("should get value", function() {
+        // GIVEN
         this.$photo.$input.val('foobar');
+
+        // WHEN
         var value = this.$photo.val();
+
+        // THEN
         expect(value).toBe('foobar');
       });
 
       it("should get trimmed value", function() {
+        // GIVEN
         this.$photo.$input.val(' foobar ');
+
+        // WHEN
         var value = this.$photo.val();
+
+        // THEN
         expect(value).toBe('foobar');
       });
     });
 
     describe("Tag Append", function() {
       it("should append tags", function() {
+        // GIVEN
         spyOn(this.$photo, 'appendTag');
         var tags = [
           { id: 1 },
           { id: 2 }
         ];
 
+        // WHEN
         this.$photo.appendTags(tags);
+
+        // THEN
         expect(this.$photo.appendTag).toHaveBeenCalledWith(tags[0]);
         expect(this.$photo.appendTag).toHaveBeenCalledWith(tags[1]);
       });
 
       it("should append a unique tag", function() {
+        // GIVEN
         spyOn(this.$photo, 'appendTag');
         var tag = { id: 1 };
 
+        // WHEN
         this.$photo.appendTags(tag);
+
+        // THEN
         expect(this.$photo.appendTag).toHaveBeenCalledWith(tag);
       });
 
       it("should append tag", function() {
+        // GIVEN
         var ratio = 2;
         var $imgWidth = this.tag.imgWidth / ratio;
         var $imgHeight = this.tag.imgHeight / ratio;
         this.$photo.$img.width.andReturn($imgWidth);
         this.$photo.$img.height.andReturn($imgHeight);
 
+        // WHEN
         this.$photo.appendTag(this.tag);
 
+        // THEN
         var $box = this.$boxes.find('> div');
         expect($box).toBeDefined();
         expect($box.length).toBe(1);
@@ -1192,6 +1392,7 @@ describe("jQuery PhotoTagging Test Suite", function() {
       });
 
       it("should append tag using custom size functions", function() {
+        // GIVEN
         this.$photo.opts.imgSize = jasmine.createSpy('imgSize').andReturn({
           width: 100,
           height: 100
@@ -1207,8 +1408,10 @@ describe("jQuery PhotoTagging Test Suite", function() {
         this.$photo.$img.width.andReturn(100);
         this.$photo.$img.height.andReturn(100);
 
+        // WHEN
         this.$photo.appendTag(this.tag);
 
+        // THEN
         var $box = this.$boxes.find('> div');
         var $divBox = $box.find('> div');
         var $spanBox = $box.find('> span');
@@ -1224,6 +1427,7 @@ describe("jQuery PhotoTagging Test Suite", function() {
       });
 
       it("should append tag using custom size functions", function() {
+        // GIVEN
         this.$photo.opts.label = function() {
           return $('<span>foobar</span>');
         };
@@ -1243,8 +1447,10 @@ describe("jQuery PhotoTagging Test Suite", function() {
         this.$photo.$img.width.andReturn(100);
         this.$photo.$img.height.andReturn(100);
 
+        // WHEN
         this.$photo.appendTag(this.tag);
 
+        // THEN
         var $box = this.$boxes.find('> div');
         var $divBox = $box.find('> div');
         var $spanBox = $box.find('> span');
@@ -1262,52 +1468,87 @@ describe("jQuery PhotoTagging Test Suite", function() {
 
     describe("Toggle Read Only", function() {
       it("should toggle read only value (turn to true)", function() {
+        // GIVEN
         this.$photo.opts.readOnly = false;
+
+        // WHEN
         this.$photo.toggleReadOnly();
+
+        // THEN
         expect(this.$photo.opts.readOnly).toBe(true);
         expect(this.$photo.$wrapper.addClass).toHaveBeenCalledWith('jq-phototagging-readonly');
         expect(this.$photo.$wrapper.hasClass('jq-phototagging-readonly')).toBe(true);
       });
 
       it("should toggle read only value (turn to false)", function() {
+        // GIVEN
         this.$photo.opts.readOnly = true;
+
+        // WHEN
         this.$photo.toggleReadOnly();
+
+        // THEN
         expect(this.$photo.opts.readOnly).toBe(false);
         expect(this.$photo.$wrapper.removeClass).toHaveBeenCalledWith('jq-phototagging-readonly');
         expect(this.$photo.$wrapper.hasClass('jq-phototagging-readonly')).toBe(false);
       });
 
       it("should get read only value (true)", function() {
+        // GIVEN
         this.$photo.opts.readOnly = true;
+
+        // WHEN
         var result = this.$photo.readOnly();
+
+        // THEN
         expect(result).toBe(true);
       });
 
       it("should get read only value (false)", function() {
+        // GIVEN
         this.$photo.opts.readOnly = false;
+
+        // WHEN
         var result = this.$photo.readOnly();
+
+        // THEN
         expect(result).toBe(false);
       });
 
       it("should set read only value (to false)", function() {
+        // GIVEN
         this.$photo.opts.readOnly = true;
+
+        // WHEN
         this.$photo.readOnly(false);
+
+        // THEN
         expect(this.$photo.opts.readOnly).toBe(false);
         expect(this.$photo.$wrapper.removeClass).toHaveBeenCalledWith('jq-phototagging-readonly');
         expect(this.$photo.$wrapper.hasClass('jq-phototagging-readonly')).toBe(false);
       });
 
       it("should set read only value (to true)", function() {
+        // GIVEN
         this.$photo.opts.readOnly = false;
+
+        // WHEN
         this.$photo.readOnly(true);
+
+        // THEN
         expect(this.$photo.opts.readOnly).toBe(true);
         expect(this.$photo.$wrapper.addClass).toHaveBeenCalledWith('jq-phototagging-readonly');
         expect(this.$photo.$wrapper.hasClass('jq-phototagging-readonly')).toBe(true);
       });
 
       it("should not set read only value if value does not change", function() {
+        // GIVEN
         this.$photo.opts.readOnly = false;
+
+        // WHEN
         this.$photo.readOnly(false);
+
+        // THEN
         expect(this.$photo.opts.readOnly).toBe(false);
         expect(this.$photo.$wrapper.addClass).not.toHaveBeenCalledWith();
         expect(this.$photo.$wrapper.removeClass).not.toHaveBeenCalledWith();
@@ -1316,19 +1557,32 @@ describe("jQuery PhotoTagging Test Suite", function() {
 
     describe("Tag Rendering", function() {
       it("should render default attribute of tag", function() {
+        // WHEN
         var label = this.$photo.renderTag(this.tag);
+
+        // THEN
         expect(label).toBe('my tag');
       });
 
       it("should render other attribute of tag", function() {
+        // GIVEN
         this.$photo.opts.label = 'foo';
+
+        // WHEN
         var label = this.$photo.renderTag(this.tag);
+
+        // THEN
         expect(label).toBe('bar');
       });
 
       it("should render attribute with a custom function", function() {
+        // GIVEN
         this.$photo.opts.label = jasmine.createSpy('label').andReturn('foobar');
+
+        // WHEN
         var label = this.$photo.renderTag(this.tag);
+
+        // THEN
         expect(label).toBe('foobar');
         expect(this.$photo.opts.label).toHaveBeenCalledWith(this.tag, null);
       });
@@ -1336,12 +1590,16 @@ describe("jQuery PhotoTagging Test Suite", function() {
 
     describe('Destroy', function() {
       it("should unbind user events", function() {
+        // GIVEN
         var $tags = this.$photo.$tags;
         var $form = this.$photo.$form;
         var $img = this.$photo.$img;
-		var $iconRemove = this.$photo.$iconRemove;
+        var $iconRemove = this.$photo.$iconRemove;
 
+        // WHEN
         this.$photo.unbind();
+
+        // THEN
         expect($tags.off).toHaveBeenCalledWith('.jqphototagging');
         expect($form.off).toHaveBeenCalledWith('.jqphototagging');
         expect($img.off).toHaveBeenCalledWith('.jqphototagging');
@@ -1349,16 +1607,20 @@ describe("jQuery PhotoTagging Test Suite", function() {
       });
 
       it("should unbind user events without form", function() {
+        // GIVEN
         var $tags = this.$photo.$tags;
         this.$photo.$form = undefined;
 
+        // WHEN
         this.$photo.unbind();
+
+        // THEN
         expect($tags.off).toHaveBeenCalledWith('.jqphototagging');
       });
 
       it("should destroy plugin", function() {
+        // GIVEN
         var $tags = this.$photo.$tags;
-        var $wrapper = this.$photo.$wrapper;
         var $img = this.$photo.$img;
         var $boxes = this.$photo.$boxes;
 
@@ -1370,7 +1632,10 @@ describe("jQuery PhotoTagging Test Suite", function() {
         // Check that wrapper is the parent
         expect($img.parent().hasClass('jq-phototagging-wrapper')).toBe(true);
 
+        // WHEN
         this.$photo.destroy();
+
+        // THEN
         expect(onDestroyed).toHaveBeenCalled();
         expect($img.unwrap).toHaveBeenCalled();
         expect($img.parent().hasClass('jq-phototagging-wrapper')).toBe(false);
@@ -1386,8 +1651,13 @@ describe("jQuery PhotoTagging Test Suite", function() {
       });
 
       it("should destroy plugin and clear jquery cache", function() {
+        // GIVEN
         spyOn(this.$photo, 'destroy');
+
+        // WHEN
         this.$img.jqPhotoTagging().destroy();
+
+        // THEN
         expect(this.$photo.destroy).toHaveBeenCalled();
         expect(this.$img.data('jqPhotoTagging')).toBeUndefined();
       });
