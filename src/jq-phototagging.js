@@ -597,7 +597,9 @@
         $iconRemove.on('click' + NAMESPACE, onClickRemove);
 
         var destroy = function() {
-          that.destroy();
+          if (that.destroy) {
+            that.destroy();
+          }
 
           // Prevent memory leak
           $img = $form = $input = $iconRemove = null;
@@ -606,7 +608,7 @@
           destroy = null;
         };
 
-        $img.on('jqPhotoTaggingRemoved', destroy);
+        $img.on('jqPhotoTaggingRemoved' + NAMESPACE, destroy);
       },
 
       /** Unbind events used to tag image */
@@ -707,7 +709,7 @@
       /** Hide form used to type a new tag. */
       hideForm: function() {
         var that = this;
-        that.$form.fadeOut('fast');
+        that.$form.hide();
         that.clear();
         that.opts.onHidden.call(that);
       },
@@ -750,7 +752,7 @@
             contentType: contentType
           });
 
-          xhr.done(function(data) {
+          var onDone = function(data) {
             that.opts.onSavedSuccess.apply(that, arguments);
 
             // Hide form
@@ -759,15 +761,21 @@
             // Append tag
             var tag = that.opts.resultFn.call(that, data);
             that.appendTags(tag);
-          });
+          };
 
-          xhr.fail(function() {
+          var onFail = function() {
             that.opts.onSavedFailed.apply(that, arguments);
-          });
+          };
 
-          xhr.always(function() {
+          var onComplete = function() {
             that.$submitting = false;
-          });
+            xhr = params = that = null;
+            onDone = onFail = onComplete = null;
+          };
+
+          xhr.done(onDone);
+          xhr.fail(onFail);
+          xhr.always(onComplete);
         }
       },
 
@@ -892,17 +900,20 @@
       destroy: function() {
         var that = this;
 
-        that.opts.onDestroyed.call(that);
+        // Do not destroy plugin twice
+        if (that.opts !== null) {
+          that.opts.onDestroyed.call(that);
 
-        that.unbind();
-        that.removeForm();
-        that.$tags.remove();
-        that.$boxes.remove();
-        that.$img.unwrap();
+          that.unbind();
+          that.removeForm();
+          that.$tags.remove();
+          that.$boxes.remove();
+          that.$img.unwrap();
 
-        for (var i in that) {
-          if (that.hasOwnProperty(i)) {
-            that[i] = null;
+          for (var i in that) {
+            if (that.hasOwnProperty(i)) {
+              that[i] = null;
+            }
           }
         }
       }

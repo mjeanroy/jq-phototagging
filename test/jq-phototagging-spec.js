@@ -1039,7 +1039,7 @@ describe("jQuery PhotoTagging Test Suite", function() {
         this.$photo.hideForm();
 
         // THEN
-        expect(this.$form.fadeOut).toHaveBeenCalled();
+        expect(this.$form.hide).toHaveBeenCalled();
         expect(this.$photo.opts.onHidden).toHaveBeenCalled();
 
         expect(this.$input.val).toHaveBeenCalledWith('');
@@ -1667,6 +1667,23 @@ describe("jQuery PhotoTagging Test Suite", function() {
 
         // THEN
         expect(this.$photo.destroy).toHaveBeenCalled();
+        expect(this.$img.data('jqPhotoTagging')).toBeUndefined();
+      });
+
+      it("should not destroy plugin twice", function() {
+        // GIVEN
+        spyOn(this.$photo, 'unbind');
+        spyOn(this.$photo, 'destroy').andCallThrough();
+
+        var unbind = this.$photo.unbind;
+
+        // WHEN
+        this.$photo.destroy();
+        this.$img.remove();
+
+        // THEN
+        expect(unbind).toHaveBeenCalled();
+        expect(unbind.callCount).toBe(1);
         expect(this.$img.data('jqPhotoTagging')).toBeUndefined();
       });
     });
