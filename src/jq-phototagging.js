@@ -871,6 +871,9 @@
           .html(label);
 
         that.$tags.append($li);
+
+        // Callback
+        that.opts.onTagAppended.call(that, tag, $li, $tagBox);
       },
 
       /**
@@ -1033,6 +1036,7 @@
       resultFn: identity,
       onInitialized: noop,
       onLoaded: noop,
+      onTagAppended: noop,
       onDestroyed: noop,
       isValid: returnTrue,
       onShown: noop,

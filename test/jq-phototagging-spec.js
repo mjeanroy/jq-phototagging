@@ -61,6 +61,7 @@ describe("jQuery PhotoTagging Test Suite", function() {
         resultFn: jasmine.any(Function),
         paramsFn: jasmine.any(Function),
         onLoaded: jasmine.any(Function),
+        onTagAppended: jasmine.any(Function),
         onShown: jasmine.any(Function),
         onHidden: jasmine.any(Function),
         onClear: jasmine.any(Function),
@@ -111,6 +112,7 @@ describe("jQuery PhotoTagging Test Suite", function() {
         resultFn: jasmine.any(Function),
         paramsFn: jasmine.any(Function),
         onLoaded: jasmine.any(Function),
+        onTagAppended: jasmine.any(Function),
         onShown: jasmine.any(Function),
         onHidden: jasmine.any(Function),
         onClear: jasmine.any(Function),
@@ -140,6 +142,7 @@ describe("jQuery PhotoTagging Test Suite", function() {
         resultFn: jasmine.any(Function),
         paramsFn: jasmine.any(Function),
         onLoaded: jasmine.any(Function),
+        onTagAppended: jasmine.any(Function),
         onShown: jasmine.any(Function),
         onHidden: jasmine.any(Function),
         onClear: jasmine.any(Function),
@@ -195,6 +198,7 @@ describe("jQuery PhotoTagging Test Suite", function() {
         resultFn: jasmine.any(Function),
         paramsFn: jasmine.any(Function),
         onLoaded: jasmine.any(Function),
+        onTagAppended: jasmine.any(Function),
         onShown: jasmine.any(Function),
         onHidden: jasmine.any(Function),
         onClear: jasmine.any(Function),
@@ -1345,6 +1349,10 @@ describe("jQuery PhotoTagging Test Suite", function() {
         this.$photo.$img.width.andReturn($imgWidth);
         this.$photo.$img.height.andReturn($imgHeight);
 
+        // Callback
+        var onTagAppended = jasmine.createSpy('onTagAppended');
+        this.$photo.opts.onTagAppended = onTagAppended;
+
         // WHEN
         this.$photo.appendTag(this.tag);
 
@@ -1385,6 +1393,30 @@ describe("jQuery PhotoTagging Test Suite", function() {
         expect($tag.attr('data-id')).toBeDefined();
         expect($tag.attr('data-id')).not.toBe('');
         expect($tag.attr('data-id')).toBe($id);
+
+        expect(onTagAppended).toHaveBeenCalledWith(jasmine.any(Object), jasmine.any($), jasmine.any($));
+        var args = onTagAppended.argsForCall[0];
+
+        var $arg0 = args[0];
+        expect($arg0).toEqual({
+          id: 1,
+          name: 'my tag',
+          foo: 'bar',
+          x: 5,
+          y: 15,
+          width: 20,
+          height: 10,
+          imgWidth: 100,
+          imgHeight: 80
+        });
+
+        var $arg1 = args[1];
+        expect($arg1.is('li')).toBe(true);
+        expect($arg1.attr('data-id')).toBe($id);
+
+        var $arg2 = args[2];
+        expect($arg2.is('div')).toBe(true);
+        expect($arg2.attr('id')).toBe($id);
       });
 
       it("should append tag using custom size functions", function() {
