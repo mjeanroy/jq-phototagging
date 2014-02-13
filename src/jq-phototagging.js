@@ -296,6 +296,16 @@
       return value;
     };
 
+    // Add special event to destroy plugin before it is removed from the DOM
+    // Think about DOM Mutation Observer (DOMNodeRemoved event) if needed
+    $.event.special.jqPhotoTaggingRemoved = {
+      remove: function(o) {
+        if (o.handler) {
+          o.handler();
+        }
+      }
+    };
+
     /**
      * Plugin.
      * @param img Image.
@@ -518,16 +528,21 @@
       /** Bind user events. */
       bind: function() {
         var that = this;
+        var $tags = that.$tags;
+        var $boxes = that.$boxes;
 
-        that.$tags.on('mouseenter' + NAMESPACE, 'li', function() {
+        var onMouseEnter = function() {
           var $this = $(this);
           var id = $this.attr('data-id');
-          that.$boxes.find('#' + id).addClass(CSS_VISIBLE);
-        });
+          $boxes.find('#' + id).addClass(CSS_VISIBLE);
+        };
 
-        that.$tags.on('mouseleave' + NAMESPACE, 'li', function() {
-          that.$boxes.find('div').removeClass(CSS_VISIBLE);
-        });
+        var onMouseLeave = function() {
+          $boxes.find('div').removeClass(CSS_VISIBLE);
+        };
+
+        $tags.on('mouseenter' + NAMESPACE, 'li', onMouseEnter);
+        $tags.on('mouseleave' + NAMESPACE, 'li', onMouseLeave);
 
         that.bindForm();
       },
@@ -535,8 +550,12 @@
       /** Bind user events on form */
       bindForm: function() {
         var that = this;
+        var $img = that.$img;
+        var $form = that.$form;
+        var $input = that.$input;
+        var $iconRemove = that.$iconRemove;
 
-        that.$img.on('click' + NAMESPACE, function(e) {
+        var onClickImage = function(e) {
           if (!that.readOnly()) {
             e.stopPropagation();
 
@@ -554,23 +573,40 @@
 
             that.showForm(x, y);
           }
-        });
+        };
 
-        that.$form.on('submit' + NAMESPACE, function(e) {
+        var onSubmitForm = function(e) {
           e.preventDefault();
           that.submit(that.val());
-        });
+        };
 
-        that.$input.on('keyup' + NAMESPACE, function(e) {
+        var onKeyup = function(e) {
           if (e.keyCode === 27) {
             // Escape key is pressed, hide form
             that.hideForm();
           }
-        });
+        };
 
-        that.$iconRemove.on('click' + NAMESPACE, function(e) {
+        var onClickRemove = function() {
           that.hideForm();
-        });
+        };
+
+        $img.on('click' + NAMESPACE, onClickImage);
+        $form.on('submit' + NAMESPACE, onSubmitForm);
+        $input.on('keyup' + NAMESPACE, onKeyup);
+        $iconRemove.on('click' + NAMESPACE, onClickRemove);
+
+        var destroy = function() {
+          that.destroy();
+
+          // Prevent memory leak
+          $img = $form = $input = $iconRemove = null;
+          onClickImage = onSubmitForm = onKeyup = onClickRemove = null;
+          that = null;
+          destroy = null;
+        };
+
+        $img.on('jqPhotoTaggingRemoved', destroy);
       },
 
       /** Unbind events used to tag image */

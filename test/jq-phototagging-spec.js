@@ -37,10 +37,6 @@ describe("jQuery PhotoTagging Test Suite", function() {
     spyOn($.fn, 'scrollLeft').andCallThrough();
   });
 
-  afterEach(function() {
-    this.$fixtures.remove();
-  });
-
   describe("jQuery Phototagging: initialization", function() {
     it("should have default options", function() {
       // WHEN
@@ -1656,6 +1652,18 @@ describe("jQuery PhotoTagging Test Suite", function() {
 
         // WHEN
         this.$img.jqPhotoTagging().destroy();
+
+        // THEN
+        expect(this.$photo.destroy).toHaveBeenCalled();
+        expect(this.$img.data('jqPhotoTagging')).toBeUndefined();
+      });
+
+      it("should destroy plugin when image is removed from DOM", function() {
+        // GIVEN
+        spyOn(this.$photo, 'destroy');
+
+        // WHEN
+        this.$img.remove();
 
         // THEN
         expect(this.$photo.destroy).toHaveBeenCalled();
